@@ -1,7 +1,8 @@
-#!/vim.opt.guicursor = ""
+vim.opt.guicursor = ""
 
-vim.opt.nu = true
+vim.opt.number = true
 vim.opt.relativenumber = true
+vim.opt.cursorline = true
 
 vim.opt.tabstop = 4
 vim.opt.softtabstop = 4
@@ -30,10 +31,5 @@ vim.opt.updatetime = 50
 
 vim.opt.colorcolumn = "80"
 
-vim.opt.clipboard = "unnamedplus"
-vim.g.clipboard = {
-    name = "macOS-clipboard",
-    copy = { ["+"] = "pbcopy", ["*"] = "pbcopy" },
-    paste = { ["+"] = "pbpaste", ["*"] = "pbpaste" },
-    cache_enabled = false,
-}
+vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#fe8019", bold = true })
+vim.api.nvim_set_hl(0, "LineNr", { fg = "#7F849C" }) -- Muted line numbers
