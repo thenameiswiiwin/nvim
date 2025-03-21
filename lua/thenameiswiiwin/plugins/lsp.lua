@@ -40,7 +40,7 @@ return {
 					graphql = { "prettierd" },
 					lua = { "stylua" },
 					php = { "php_cs_fixer" },
-					blade = { "blade" },
+					blade = { "blade-formatter" },
 				},
 				format_on_save = {
 					timeout_ms = 500,
