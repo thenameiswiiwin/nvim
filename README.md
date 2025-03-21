@@ -1,19 +1,19 @@
 # Neovim Configuration
 
-A modern Neovim setup optimized for web development with JavaScript/TypeScript, React/Next.js, Vue/Nuxt, TailwindCSS, and Laravel.
+A modern Neovim setup optimized for web development with JavaScript/TypeScript, React/Vue, Go, and more. This configuration focuses on performance, clean design, and developer productivity.
 
 ## Features
 
-- 🚀 Fast startup with lazy-loading plugins
-- 🎨 Modern UI with Catppuccin theme
-- 📊 Smart LSP configuration for web development
-- 🔧 Debugging support with nvim-dap
-- 🧩 Code completion with nvim-cmp and GitHub Copilot
-- 🔍 Fuzzy finding with Telescope
-- 🌲 Syntax highlighting with Treesitter
-- 🧪 Testing integration with Neotest
-- 📂 File navigation with Oil.nvim
-- 📝 Snippets support with LuaSnip
+- 🚀 Fast startup with optimized lazy-loading
+- 🎨 Clean UI with Catppuccin theme
+- 📊 Intelligent LSP setup for multiple languages
+- 🔧 Integrated debugging with nvim-dap
+- 🧩 Powerful code completion (nvim-cmp + Copilot)
+- 🔍 Fast fuzzy finding with Telescope
+- 🌲 Syntax highlighting via Treesitter
+- 🧪 Testing framework with Neotest
+- 📂 Modern file navigation (Oil.nvim + Harpoon)
+- 📝 Snippet support with LuaSnip
 
 ## Structure
 
@@ -24,14 +24,13 @@ nvim/
 │   └── thenameiswiiwin/     # Personal namespace
 │       ├── init.lua         # Main configuration loader
 │       ├── set.lua          # Vim options
-│       ├── remap.lua        # Key mappings
+│       ├── remap.lua        # Core key mappings
 │       ├── lazy_init.lua    # Lazy plugin manager setup
 │       └── lazy/            # Plugin configurations
 │           ├── init.lua     # Core plugins
 │           ├── lsp.lua      # LSP configuration
 │           ├── colors.lua   # Theme configuration
 │           ├── treesitter.lua  # Syntax highlighting
-│           ├── telescope.lua   # Fuzzy finder
 │           └── ...          # Other plugin configs
 ```
 
@@ -39,9 +38,10 @@ nvim/
 
 - Neovim >= 0.9.0
 - Git
-- A [Nerd Font](https://www.nerdfonts.com/) for icons
-- (Optional) Node.js and npm for LSP features
-- (Optional) Go for Go development
+- A [Nerd Font](https://www.nerdfonts.com/) installed and configured in your terminal
+- Node.js and npm (optional, for LSP features)
+- Go (optional, for Go development)
+- Ripgrep (for Telescope grep functionality)
 
 ## Installation
 
@@ -69,171 +69,251 @@ The configuration will automatically:
 - Install all configured plugins
 - Set up LSP servers via Mason
 
-## Key Features and Plugins
+## Key Plugins
 
-### Plugin Management
+### Core
 
-- [lazy.nvim](https://github.com/folke/lazy.nvim) - Modern plugin manager
+- **[lazy.nvim](https://github.com/folke/lazy.nvim)** - Modern plugin manager
+- **[plenary.nvim](https://github.com/nvim-lua/plenary.nvim)** - Lua functions library
 
-### Theme and UI
+### UI and Aesthetics
 
-- [Catppuccin](https://github.com/catppuccin/nvim) - Main colorscheme
-- [Rose Pine](https://github.com/rose-pine/neovim) - Alternative colorscheme
-- Custom statusline with express_line.nvim
+- **[catppuccin](https://github.com/catppuccin/nvim)** - Main colorscheme
+- **[express_line.nvim](https://github.com/tjdevries/express_line.nvim)** - Custom statusline
 
-### LSP (Language Server Protocol)
+### Editor Enhancement
 
-- [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) - Official LSP config
-- [mason.nvim](https://github.com/williamboman/mason.nvim) - Package manager for LSP servers
-- Configured for JavaScript, TypeScript, Vue, CSS, HTML, and more
+- **[nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter)** - Advanced syntax highlighting
+- **[telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)** - Fuzzy finder
+- **[oil.nvim](https://github.com/stevearc/oil.nvim)** - File explorer in buffer
+- **[harpoon](https://github.com/ThePrimeagen/harpoon)** - File navigation marks
+- **[undotree](https://github.com/mbbill/undotree)** - Visualization of undo history
+- **[trouble.nvim](https://github.com/folke/trouble.nvim)** - Diagnostics list
+- **[zen-mode.nvim](https://github.com/folke/zen-mode.nvim)** - Distraction-free coding
 
-### Completion & Snippets
+### LSP and Completion
 
-- [nvim-cmp](https://github.com/hrsh7th/nvim-cmp) - Completion engine
-- [LuaSnip](https://github.com/L3MON4D3/LuaSnip) - Snippet engine
-- [Copilot](https://github.com/zbirenbaum/copilot.lua) - GitHub Copilot integration
+- **[nvim-lspconfig](https://github.com/neovim/nvim-lspconfig)** - LSP configuration
+- **[mason.nvim](https://github.com/williamboman/mason.nvim)** - Package manager for LSP
+- **[conform.nvim](https://github.com/stevearc/conform.nvim)** - Formatter
+- **[nvim-lint](https://github.com/mfussenegger/nvim-lint)** - Linter
+- **[nvim-cmp](https://github.com/hrsh7th/nvim-cmp)** - Completion engine
+- **[LuaSnip](https://github.com/L3MON4D3/LuaSnip)** - Snippet engine
+- **[copilot.lua](https://github.com/zbirenbaum/copilot.lua)** - GitHub Copilot integration
 
-### Syntax & Highlighting
+### Git
 
-- [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) - Syntax highlighting
+- **[vim-fugitive](https://github.com/tpope/vim-fugitive)** - Git integration
+- **[lazygit.nvim](https://github.com/kdheepak/lazygit.nvim)** - LazyGit terminal UI
 
-### Navigation
+### Debugging and Testing
 
-- [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) - Fuzzy finder
-- [harpoon](https://github.com/ThePrimeagen/harpoon) - File navigation
-- [oil.nvim](https://github.com/stevearc/oil.nvim) - File explorer
+- **[nvim-dap](https://github.com/mfussenegger/nvim-dap)** - Debug Adapter Protocol
+- **[nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui)** - UI for debugging
+- **[neotest](https://github.com/nvim-neotest/neotest)** - Testing framework
 
-### Git Integration
+### Utilities
 
-- [vim-fugitive](https://github.com/tpope/vim-fugitive) - Git commands
-- [lazygit.nvim](https://github.com/kdheepak/lazygit.nvim) - LazyGit integration
-
-### Debugging
-
-- [nvim-dap](https://github.com/mfussenegger/nvim-dap) - Debug Adapter Protocol client
-- [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) - UI for nvim-dap
-
-### Testing
-
-- [neotest](https://github.com/nvim-neotest/neotest) - Testing framework
-- Configured for Go and other languages
-
-### Formatting & Linting
-
-- [conform.nvim](https://github.com/stevearc/conform.nvim) - Formatter
-- [nvim-lint](https://github.com/mfussenegger/nvim-lint) - Linter
-
-### Other Utilities
-
-- [mini.nvim](https://github.com/echasnovski/mini.nvim) - Collection of minimal plugins
-- [trouble.nvim](https://github.com/folke/trouble.nvim) - Pretty diagnostics
-- [zen-mode.nvim](https://github.com/folke/zen-mode.nvim) - Distraction-free coding
-- [undotree](https://github.com/mbbill/undotree) - Visualize undo history
-- [cloak.nvim](https://github.com/laytan/cloak.nvim) - Hide sensitive information
+- **[mini.nvim](https://github.com/echasnovski/mini.nvim)** - Collection of minimal plugins
+- **[cloak.nvim](https://github.com/laytan/cloak.nvim)** - Hide sensitive information
 
 ## Key Mappings
 
-This configuration uses Space as the leader key. Here are some important keybindings:
-
-### General
-
-- `<Space>` - Leader key
-- `<leader><leader>` - Source current file
-- `<leader>pv` - Open file explorer (Oil)
-- `<leader>pp` - Toggle floating file explorer
-- `<C-f>` - Open tmux sessionizer
+This configuration uses Space as the leader key. Here are the most important keybindings:
 
 ### Navigation
 
-- `<leader>pf` - Find files
+- `<leader>pv` - Open file explorer (Oil)
+- `<leader>pf` - Find files with Telescope
 - `<C-p>` - Find Git files
 - `<leader>ps` - Search by grep
-- `<C-h/t/n/s>` - Navigate to harpoon marks 1-4
-- `<leader>a` - Add file to harpoon
-- `<C-e>` - Toggle harpoon quick menu
+- `<leader>a` - Add file to Harpoon
+- `<C-e>` - Toggle Harpoon menu
+- `<C-h/t/n/s>` - Jump to Harpoon marks 1-4
 
 ### LSP
 
 - `gd` - Go to definition
 - `K` - Show hover documentation
-- `<leader>vws` - Workspace symbol search
 - `<leader>vd` - Show diagnostics
 - `<leader>ca` - Code actions
 - `<leader>vrr` - Show references
-- `<leader>vrn` - Rename
-- `[d` / `]d` - Next/previous diagnostic
+- `<leader>vrn` - Rename symbol
+- `<leader>f` - Format file/selection
 
 ### Git
 
 - `<leader>gs` - Git status (Fugitive)
 - `<leader>gg` - Open LazyGit
 
-### Formatting & Editing
+### Editing
 
-- `<leader>f` - Format file
-- `<leader>l` - Run linter
 - `<leader>s` - Search and replace word under cursor
+- `J/K` (visual mode) - Move selection up/down
+- `<leader>y` - Yank to system clipboard
+- `<leader>d` - Delete without yanking
 
-### Testing & Debugging
+### Debugging
+
+- `<leader>b` - Toggle breakpoint
+- `<F8>` - Continue
+- `<F10>` - Step over
+- `<F11>` - Step into
+- `<F12>` - Step out
+
+### Testing
 
 - `<leader>tr` - Run nearest test
 - `<leader>ts` - Run test suite
 - `<leader>td` - Debug nearest test
-- `<F8>` - Debug: Continue
-- `<F10>` - Debug: Step Over
-- `<F11>` - Debug: Step Into
-- `<F12>` - Debug: Step Out
-- `<leader>b` - Toggle breakpoint
 
-### UI & Focus
+### UI
 
 - `<leader>zz` - Toggle Zen mode (with numbers)
 - `<leader>zZ` - Toggle Zen mode (no numbers)
-- `<leader>u` - Toggle UndoTree
-- `<leader>tt` - Toggle Trouble diagnostics
+- `<leader>u` - Toggle Undotree
+- `<leader>tt` - Toggle Trouble panel
 
-## Optimization Suggestions
+## Language Support
 
-Based on your configuration, here are some suggestions for optimization:
+This configuration provides rich support for:
 
-1. **Plugin Consolidation**: You have multiple Git-related plugins (vim-fugitive, lazygit). Consider if you need both.
+- **JavaScript/TypeScript**
+- **React/Vue**
+- **HTML/CSS**
+- **Go**
+- **Lua**
+- **PHP**
+- **Rust**
+- **Markdown**
 
-2. **LSP Configuration**: Your LSP setup is comprehensive but somewhat complex. Consider using [mason-lspconfig.nvim](https://github.com/williamboman/mason-lspconfig.nvim) more extensively for automatic server setup.
-
-3. **Color Theme Management**: You're loading both Rose Pine and Catppuccin. Consider choosing one as default and make the other optional.
-
-4. **Key Mapping Organization**: Consider organizing your key mappings by category for better maintenance.
-
-5. **Module Structure**: Your lazy/ directory has many files. Consider grouping related plugins into single files (e.g., git.lua for all Git plugins).
+Each language has appropriate LSP servers, formatters, and linters configured.
 
 ## Customization
 
-You can customize this configuration by modifying the lua files in the `lua/thenameiswiiwin` directory:
+### Adding New Plugins
 
-- Edit `set.lua` for Vim options
-- Edit `remap.lua` for key mappings
-- Edit or add files in the `lazy/` directory for plugin configurations
+Add new plugins in the `lua/thenameiswiiwin/lazy/` directory:
+
+```lua
+-- Example: lua/thenameiswiiwin/lazy/newplugin.lua
+return {
+  "username/plugin-name",
+  lazy = true, -- Load on demand
+  event = "VeryLazy", -- Or specific events
+  config = function()
+    require("plugin-name").setup({
+      -- Your configuration
+    })
+  end,
+}
+```
+
+### Changing Theme
+
+Modify the `colors.lua` file to change the default theme:
+
+```lua
+function ColorMyPencils(color)
+  color = color or "your-theme-name" -- Change this
+  vim.cmd.colorscheme(color)
+  -- Additional customization
+end
+```
+
+### Adding LSP Servers
+
+Add new LSP servers in the `lsp.lua` file:
+
+```lua
+-- In the ensure_installed list:
+require("mason-lspconfig").setup({
+  ensure_installed = {
+    "existing_servers",
+    "your_new_server",
+  },
+  -- ...
+})
+
+-- Add server-specific configuration in handlers
+["your_new_server"] = function()
+  lspconfig.your_new_server.setup({
+    capabilities = capabilities,
+    -- Server-specific settings
+  })
+end,
+```
+
+## Performance Optimizations
+
+This configuration includes several optimizations:
+
+1. **Lazy Loading** - Most plugins only load when needed
+2. **Efficient Plugin Choices** - Carefully selected for performance
+3. **Treesitter Optimizations** - Large file detection
+4. **Minimal UI** - Clean interface without unnecessary elements
+5. **Strategic Autocommands** - Used sparingly to avoid overhead
 
 ## Troubleshooting
 
-If you encounter issues:
+### Common Issues
 
-1. Check the health of your Neovim installation:
+1. **LSP servers not working**
 
-   ```
-   :checkhealth
-   ```
+   - Run `:Mason` and check if servers are installed
+   - Run `:checkhealth` for diagnostic information
 
-2. Ensure all required dependencies are installed.
+2. **Missing icons**
 
-3. Update plugins:
+   - Ensure you have a Nerd Font installed and configured
 
-   ```
-   :Lazy update
-   ```
+3. **Slow startup**
 
-4. Sync plugins:
-   ```
-   :Lazy sync
-   ```
-# nvim
+   - Run `:Lazy profile` to identify slow plugins
+   - Consider disabling heavy plugins you don't use
+
+4. **Plugin errors**
+   - Update plugins with `:Lazy update`
+   - Sync plugins with `:Lazy sync`
+
+### Commands for Debugging
+
+- `:checkhealth` - Check Neovim health
+- `:Lazy profile` - Profile plugin loading time
+- `:LspInfo` - Show LSP information
+- `:TSInstallInfo` - Show Treesitter parser status
+
+## Updates and Maintenance
+
+1. Update plugins regularly:
+
+```vim
+:Lazy update
+```
+
+2. Check for Neovim updates:
+
+```bash
+# If installed via package manager
+sudo apt update && sudo apt upgrade neovim
+
+# If installed via appimage/tarball, download the latest version
+```
+
+3. Update Treesitter parsers:
+
+```vim
+:TSUpdate
+```
+
+## Credits
+
+This configuration draws inspiration from:
+
+- [ThePrimeagen](https://github.com/ThePrimeagen)
+- [TJ DeVries](https://github.com/tjdevries)
+- [Catppuccin theme](https://github.com/catppuccin/nvim)
+
+---
+
+Feel free to fork and customize this configuration to match your preferences. For issues or suggestions, please open an issue on the GitHub repository.
