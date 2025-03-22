@@ -1,47 +1,67 @@
--- Performance settings
+local opt = vim.opt
+
+-- Performance
+opt.lazyredraw = true
+opt.shell = "/bin/zsh"
 vim.g.loaded_python3_provider = 0
 vim.g.loaded_ruby_provider = 0
 vim.g.loaded_perl_provider = 0
 vim.g.loaded_node_provider = 0
 
--- UI Options
-vim.opt.guicursor = ""
-vim.opt.number = true
-vim.opt.relativenumber = true
-vim.opt.cursorline = true
-vim.opt.termguicolors = true
-vim.opt.signcolumn = "yes"
-vim.opt.colorcolumn = "80"
-vim.opt.scrolloff = 8
-vim.opt.updatetime = 50
-vim.opt.conceallevel = 2
-vim.opt.concealcursor = "nc"
+-- UI
+opt.number = true
+opt.relativenumber = true
+opt.termguicolors = true
+opt.showmode = false
+opt.signcolumn = "yes"
+opt.cursorline = true
+opt.scrolloff = 8
+opt.sidescrolloff = 8
+opt.cmdheight = 1
+opt.completeopt = "menuone,noselect"
+opt.pumheight = 10
+opt.updatetime = 100
+opt.timeoutlen = 300
+opt.conceallevel = 0
+opt.showmatch = true
+opt.title = true
+opt.titlestring = "%<%F%=%l/%L - nvim"
 
--- Indentation
-vim.opt.tabstop = 4
-vim.opt.softtabstop = 4
-vim.opt.shiftwidth = 4
-vim.opt.expandtab = true
-vim.opt.smartindent = true
+-- Tabs & Indentation
+opt.expandtab = true
+opt.shiftwidth = 2
+opt.tabstop = 2
+opt.softtabstop = 2
+opt.smartindent = true
+opt.breakindent = true
+opt.wrap = false
 
 -- Search
-vim.opt.hlsearch = false
-vim.opt.incsearch = true
+opt.hlsearch = true
+opt.incsearch = true
+opt.ignorecase = true
+opt.smartcase = true
 
 -- Files
-vim.opt.swapfile = false
-vim.opt.backup = false
-vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
-vim.opt.undofile = true
-vim.opt.maxmempattern = 5000
+opt.backup = false
+opt.swapfile = false
+opt.undofile = true
+opt.undolevels = 10000
+opt.fileencoding = "utf-8"
+opt.hidden = true
 
--- Display
-vim.opt.wrap = false
-vim.opt.isfname:append("@-@")
+-- Splits
+opt.splitbelow = true
+opt.splitright = true
 
--- Status line
-vim.opt.laststatus = 3
+-- System
+opt.clipboard = "unnamedplus"
+opt.mouse = "a"
+opt.mousemoveevent = true
 
--- Highlights
-vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#fe8019", bold = true })
-vim.api.nvim_set_hl(0, "LineNr", { fg = "#7F849C" })
+-- Appearance
+opt.list = true
+opt.listchars = "tab:» ,trail:·,nbsp:␣,extends:›,precedes:‹"
+opt.shortmess:append("c")
+opt.fillchars = "eob: "
+opt.colorcolumn = "80"

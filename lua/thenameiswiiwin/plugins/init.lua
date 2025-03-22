@@ -1,16 +1,65 @@
 return {
-	-- Core dependencies
-	{ "nvim-lua/plenary.nvim", name = "plenary", lazy = false },
+	-- Core plugins
+	{ "nvim-lua/plenary.nvim", lazy = false },
 
-	-- Fun
-	{ "eandrju/cellular-automaton.nvim", cmd = "CellularAutomaton" },
+	-- Development
+	{ "tpope/vim-sleuth" }, -- Detect tabstop and shiftwidth automatically
+	{ "numToStr/Comment.nvim", opts = {}, event = "VeryLazy" },
 
-	-- Performance metrics
+	-- Navigation
+	{ "stevearc/oil.nvim", dependencies = { "nvim-tree/nvim-web-devicons" } },
+
+	-- Session management
 	{
-		"dstein64/vim-startuptime",
-		cmd = "StartupTime",
-		config = function()
-			vim.g.startuptime_tries = 10
-		end,
+		"folke/persistence.nvim",
+		event = "BufReadPre",
+		opts = { options = { "buffers", "curdir", "tabpages", "winsize", "help" } },
+		keys = {
+			{
+				"<leader>qs",
+				function()
+					require("persistence").load()
+				end,
+				desc = "Restore session",
+			},
+			{
+				"<leader>ql",
+				function()
+					require("persistence").load({ last = true })
+				end,
+				desc = "Restore last session",
+			},
+			{
+				"<leader>qd",
+				function()
+					require("persistence").stop()
+				end,
+				desc = "Don't save current session",
+			},
+		},
 	},
+
+	-- Useful utilities
+	{ "echasnovski/mini.pairs", event = "VeryLazy", opts = {} },
+	{
+		"echasnovski/mini.surround",
+		event = "VeryLazy",
+		opts = {
+			mappings = {
+				add = "gsa", -- Add surrounding
+				delete = "gsd", -- Delete surrounding
+				find = "gsf", -- Find surrounding (to the right)
+				find_left = "gsF", -- Find surrounding (to the left)
+				highlight = "gsh", -- Highlight surrounding
+				replace = "gsr", -- Replace surrounding
+				update_n_lines = "gsn", -- Update n lines for surrounding
+
+				-- Make these more specific to avoid overlap warnings
+				suffix_last = "l", -- Suffix for 'last' finder
+				suffix_next = "n", -- Suffix for 'next' finder
+			},
+			search_method = "cover_or_next",
+		},
+	},
+	{ "famiu/bufdelete.nvim", event = "VeryLazy" },
 }

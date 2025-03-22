@@ -1,89 +1,146 @@
-vim.g.mapleader = " "
+local keymap = vim.keymap.set
+local opts = { noremap = true, silent = true }
 
--- File navigation
-vim.keymap.set("n", "<leader>pf", function()
-	require("telescope.builtin").find_files()
-end, { desc = "Find files" })
-vim.keymap.set("n", "<C-p>", function()
-	require("telescope.builtin").git_files()
-end, { desc = "Find git files" })
-vim.keymap.set("n", "<leader>ps", function()
-	require("telescope.builtin").grep_string({ search = vim.fn.input("Grep > ") })
-end, { desc = "Search by grep" })
-vim.keymap.set("n", "<leader>pws", function()
-	local word = vim.fn.expand("<cword>")
-	require("telescope.builtin").grep_string({ search = word })
-end, { desc = "Search word under cursor" })
+-- General
+keymap("n", "<leader>w", "<cmd>w<cr>", { desc = "Save" })
+keymap("n", "<leader>q", "<cmd>q<cr>", { desc = "Quit" })
+keymap("n", "<leader><space>", "<cmd>nohlsearch<cr>", { desc = "Clear highlights" })
+keymap("i", "jk", "<Esc>", opts)
+keymap("n", "<leader>sv", "<cmd>source $MYVIMRC<cr>", { desc = "Source init.lua" })
 
--- Web development specific
-vim.keymap.set("n", "<leader>cc", function()
-	vim.cmd("Telescope colorscheme")
-end, { desc = "Change colorscheme" })
-vim.keymap.set("n", "<leader>ct", "<cmd>TSToolsGoToSourceDefinition<CR>", { desc = "TS go to source" })
-vim.keymap.set("n", "<leader>co", "<cmd>TSToolsOrganizeImports<CR>", { desc = "TS organize imports" })
-vim.keymap.set("n", "<leader>cs", "<cmd>TSToolsSortImports<CR>", { desc = "TS sort imports" })
-vim.keymap.set("n", "<leader>cu", "<cmd>TSToolsRemoveUnused<CR>", { desc = "TS remove unused" })
-vim.keymap.set("n", "<leader>cf", "<cmd>TSToolsFixAll<CR>", { desc = "TS fix all" })
-vim.keymap.set("n", "<leader>cA", "<cmd>TSToolsAddMissingImports<CR>", { desc = "TS add missing imports" })
+-- Harpoon
+keymap("n", "<leader>ha", function()
+	require("harpoon"):list():append()
+end, { desc = "Harpoon add file" })
+keymap("n", "<leader>hm", function()
+	require("harpoon").ui:toggle_quick_menu(require("harpoon"):list())
+end, { desc = "Harpoon quick menu" })
+keymap("n", "<leader>h1", function()
+	require("harpoon"):list():select(1)
+end, { desc = "Harpoon file 1" })
+keymap("n", "<leader>h2", function()
+	require("harpoon"):list():select(2)
+end, { desc = "Harpoon file 2" })
+keymap("n", "<leader>h3", function()
+	require("harpoon"):list():select(3)
+end, { desc = "Harpoon file 3" })
+keymap("n", "<leader>h4", function()
+	require("harpoon"):list():select(4)
+end, { desc = "Harpoon file 4" })
 
--- Laravel specific
-vim.keymap.set("n", "<leader>la", "<cmd>Laravel artisan<cr>", { desc = "Laravel Artisan" })
-vim.keymap.set("n", "<leader>lr", "<cmd>Laravel routes<cr>", { desc = "Laravel Routes" })
-vim.keymap.set("n", "<leader>lm", "<cmd>Laravel migrate<cr>", { desc = "Laravel Migrate" })
-vim.keymap.set("n", "<leader>ls", "<cmd>Laravel sail<cr>", { desc = "Laravel Sail" })
+-- Window navigation
+keymap("n", "<C-h>", "<C-w>h", opts)
+keymap("n", "<C-j>", "<C-w>j", opts)
+keymap("n", "<C-k>", "<C-w>k", opts)
+keymap("n", "<C-l>", "<C-w>l", opts)
+
+-- Resize windows
+keymap("n", "<C-Up>", "<cmd>resize +2<cr>", opts)
+keymap("n", "<C-Down>", "<cmd>resize -2<cr>", opts)
+keymap("n", "<C-Left>", "<cmd>vertical resize -2<cr>", opts)
+keymap("n", "<C-Right>", "<cmd>vertical resize +2<cr>", opts)
+
+-- Buffer navigation
+keymap("n", "<S-l>", "<cmd>bnext<cr>", opts)
+keymap("n", "<S-h>", "<cmd>bprevious<cr>", opts)
+keymap("n", "<leader>c", "<cmd>bdelete<cr>", { desc = "Close buffer" })
 
 -- Text manipulation
-vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
-vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
-vim.keymap.set("n", "J", "mzJ`z", { desc = "Join lines keeping cursor position" })
-vim.keymap.set(
-	"n",
-	"<leader>s",
-	[[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]],
-	{ desc = "Search and replace word" }
-)
+keymap("v", "<", "<gv", opts) -- Stay in indent mode when indenting
+keymap("v", ">", ">gv", opts)
+keymap("v", "J", ":m '>+1<cr>gv=gv", opts) -- Move text up and down
+keymap("v", "K", ":m '<-2<cr>gv=gv", opts)
+keymap("n", "J", "mzJ`z", opts) -- Join lines while keeping cursor position
+keymap("n", "<leader>p", '"_dP', opts) -- Paste without yanking
 
--- Buffer management
-vim.keymap.set("n", "<Tab>", "<cmd>bnext<CR>", { desc = "Next buffer" })
-vim.keymap.set("n", "<S-Tab>", "<cmd>bprevious<CR>", { desc = "Previous buffer" })
-vim.keymap.set("n", "<leader>bd", "<cmd>bdelete<CR>", { desc = "Delete buffer" })
-vim.keymap.set("n", "<leader>bD", "<cmd>%bd|e#|bd#<CR>", { desc = "Delete all buffers but current" })
+-- Improved movement
+keymap("n", "n", "nzzzv", opts) -- Center cursor when navigating search results
+keymap("n", "N", "Nzzzv", opts)
+keymap("n", "<C-d>", "<C-d>zz", opts) -- Center when navigating up/down
+keymap("n", "<C-u>", "<C-u>zz", opts)
+keymap("n", "{", "{zz", opts)
+keymap("n", "}", "}zz", opts)
 
--- Movement
-vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = "Scroll down half page" })
-vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = "Scroll up half page" })
-vim.keymap.set("n", "n", "nzzzv", { desc = "Next search result centered" })
-vim.keymap.set("n", "N", "Nzzzv", { desc = "Previous search result centered" })
+-- Terminal - make these consistent
+keymap("n", "<leader>tt", "<cmd>ToggleTerm<cr>", { desc = "Toggle terminal" }) -- Changed from <C-\>
+keymap("n", "<leader>th", "<cmd>ToggleTerm direction=horizontal<cr>", { desc = "Horizontal terminal" })
+keymap("n", "<leader>tv", "<cmd>ToggleTerm direction=vertical size=40<cr>", { desc = "Vertical terminal" })
+keymap("n", "<leader>tf", "<cmd>ToggleTerm direction=float<cr>", { desc = "Float terminal" })
 
--- Split navigation
-vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Move to left split" })
-vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Move to split below" })
-vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Move to split above" })
-vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Move to right split" })
+-- LSP (to be expanded in lsp.lua)
+keymap("n", "<leader>le", vim.diagnostic.open_float, { desc = "Show diagnostic" })
+keymap("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
+keymap("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+keymap("n", "<leader>lq", vim.diagnostic.setloclist, { desc = "Diagnostic list" })
 
--- Resize splits
-vim.keymap.set("n", "<C-Up>", ":resize -2<CR>", { desc = "Decrease height" })
-vim.keymap.set("n", "<C-Down>", ":resize +2<CR>", { desc = "Increase height" })
-vim.keymap.set("n", "<C-Left>", ":vertical resize -2<CR>", { desc = "Decrease width" })
-vim.keymap.set("n", "<C-Right>", ":vertical resize +2<CR>", { desc = "Increase width" })
+-- File explorer
+keymap("n", "<leader>e", "<cmd>Oil<cr>", { desc = "Open file explorer" })
 
--- Clipboard operations
-vim.keymap.set("x", "<leader>p", [["_dP]], { desc = "Paste without overwriting register" })
-vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]], { desc = "Copy to system clipboard" })
-vim.keymap.set("n", "<leader>Y", [["+Y]], { desc = "Copy line to system clipboard" })
-vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]], { desc = "Delete without copying" })
+-- Search
+keymap("n", "<leader>sf", function()
+	require("telescope.builtin").find_files()
+end, { desc = "Find files" })
+keymap("n", "<leader>sg", function()
+	require("telescope.builtin").live_grep()
+end, { desc = "Live grep" })
+keymap("n", "<leader>ss", function()
+	require("telescope.builtin").grep_string()
+end, { desc = "Grep string" })
+keymap("n", "<leader>sb", function()
+	require("telescope.builtin").buffers()
+end, { desc = "Find buffers" })
 
 -- Git
-vim.keymap.set("n", "<leader>gg", "<cmd>LazyGit<cr>", { desc = "LazyGit" })
-vim.keymap.set("n", "<leader>gd", "<cmd>Gitsigns diffthis<cr>", { desc = "Git diff" })
-vim.keymap.set("n", "<leader>gb", "<cmd>Telescope git_branches<cr>", { desc = "Git branches" })
-vim.keymap.set("n", "<leader>gc", "<cmd>Telescope git_commits<cr>", { desc = "Git commits" })
-vim.keymap.set("n", "<leader>gs", "<cmd>Telescope git_status<cr>", { desc = "Git status" })
+keymap("n", "<leader>gg", "<cmd>LazyGit<cr>", { desc = "LazyGit" })
+keymap("n", "<leader>gj", function()
+	require("gitsigns").next_hunk()
+end, { desc = "Next hunk" })
+keymap("n", "<leader>gk", function()
+	require("gitsigns").prev_hunk()
+end, { desc = "Previous hunk" })
+keymap("n", "<leader>gl", function()
+	require("gitsigns").blame_line()
+end, { desc = "Blame line" })
+keymap("n", "<leader>gp", function()
+	require("gitsigns").preview_hunk()
+end, { desc = "Preview hunk" })
+keymap("n", "<leader>gr", function()
+	require("gitsigns").reset_hunk()
+end, { desc = "Reset hunk" })
+keymap("n", "<leader>gs", function()
+	require("gitsigns").stage_hunk()
+end, { desc = "Stage hunk" })
+keymap("n", "<leader>gu", function()
+	require("gitsigns").undo_stage_hunk()
+end, { desc = "Undo stage hunk" })
 
--- Misc
-vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true, desc = "Make file executable" })
-vim.keymap.set("i", "<C-c>", "<Esc>", { desc = "Exit insert mode with Ctrl+c" })
-vim.keymap.set("n", "Q", "<nop>", { desc = "Disable Ex mode" })
-vim.keymap.set("n", "<leader><leader>", function()
-	vim.cmd("so")
-end, { desc = "Source current file" })
+-- Testing - move to separate group
+keymap("n", "<leader>tr", function()
+	require("neotest").run.run()
+end, { desc = "Run nearest test" })
+keymap("n", "<leader>tR", function()
+	require("neotest").run.run(vim.fn.expand("%"))
+end, { desc = "Run file tests" })
+keymap("n", "<leader>ts", function()
+	require("neotest").summary.toggle()
+end, { desc = "Toggle test summary" })
+keymap("n", "<leader>to", function()
+	require("neotest").output.open({ enter = true })
+end, { desc = "Show test output" })
+keymap("n", "<leader>tO", function()
+	require("neotest").output.open({ enter = true, short = true })
+end, { desc = "Show test output (short)" })
+keymap("n", "<leader>tp", function()
+	require("neotest").run.stop()
+end, { desc = "Stop test" })
+keymap("n", "<leader>td", function()
+	require("neotest").run.run({ strategy = "dap" })
+end, { desc = "Debug nearest test" })
+
+-- Web Development
+keymap("n", "<leader>lt", "<cmd>TypescriptFixAll<cr>", { desc = "Fix TypeScript" })
+keymap("n", "<leader>lo", "<cmd>TypescriptOrganizeImports<cr>", { desc = "Organize imports" })
+
+-- PHP/Laravel
+keymap("n", "<leader>la", "<cmd>Laravel artisan<cr>", { desc = "Laravel Artisan" })
+keymap("n", "<leader>lr", "<cmd>Laravel routes<cr>", { desc = "Laravel Routes" })

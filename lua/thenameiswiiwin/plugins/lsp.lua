@@ -1,90 +1,47 @@
 return {
+	-- LSP Configuration
 	{
 		"neovim/nvim-lspconfig",
-		dependencies = {
-			"stevearc/conform.nvim",
-			"williamboman/mason.nvim",
-			"williamboman/mason-lspconfig.nvim",
-			"WhoIsSethDaniel/mason-tool-installer.nvim",
-			"hrsh7th/nvim-cmp",
-			"hrsh7th/cmp-nvim-lsp",
-			"hrsh7th/cmp-buffer",
-			"hrsh7th/cmp-path",
-			"hrsh7th/cmp-cmdline",
-			"L3MON4D3/LuaSnip",
-			"saadparwaiz1/cmp_luasnip",
-			"mfussenegger/nvim-lint",
-			"j-hui/fidget.nvim",
-			"roobert/tailwindcss-colorizer-cmp.nvim",
-			"folke/neodev.nvim",
-		},
 		event = { "BufReadPre", "BufNewFile" },
+		dependencies = {
+			-- LSP Management
+			{ "williamboman/mason.nvim" },
+			{ "williamboman/mason-lspconfig.nvim" },
+			{ "WhoIsSethDaniel/mason-tool-installer.nvim" },
+			-- Useful status updates for LSP
+			{ "j-hui/fidget.nvim", opts = {} },
+			-- Additional lua configuration
+			{ "folke/neodev.nvim", opts = {} },
+		},
 		config = function()
-			-- Setup neodev for better lua development
-			require("neodev").setup()
-
-			-- Formatter setup
-			require("conform").setup({
-				formatters_by_ft = {
-					javascript = { "prettierd" },
-					typescript = { "prettierd" },
-					javascriptreact = { "prettierd" },
-					typescriptreact = { "prettierd" },
-					vue = { "prettierd" },
-					css = { "prettierd" },
-					scss = { "prettierd" },
-					html = { "prettierd" },
-					json = { "prettierd" },
-					yaml = { "prettierd" },
-					markdown = { "prettierd" },
-					graphql = { "prettierd" },
-					lua = { "stylua" },
-					php = { "php_cs_fixer" },
-					blade = { "blade-formatter" },
-				},
-				format_on_save = {
-					timeout_ms = 500,
-					lsp_fallback = true,
-				},
-			})
-
-			vim.keymap.set({ "n", "v" }, "<leader>f", function()
-				require("conform").format({ timeout_ms = 500 })
-			end, { desc = "Format document" })
-
-			-- Linter setup
-			local lint = require("lint")
-			lint.linters_by_ft = {
-				javascript = { "eslint_d" },
-				typescript = { "eslint_d" },
-				javascriptreact = { "eslint_d" },
-				typescriptreact = { "eslint_d" },
-				vue = { "eslint_d" },
-				lua = { "luacheck" },
-				php = { "phpstan" },
-			}
-
-			vim.api.nvim_create_autocmd({ "BufWritePost", "InsertLeave" }, {
-				callback = function()
-					lint.try_lint()
-				end,
-			})
-
-			vim.keymap.set("n", "<leader>l", function()
-				lint.try_lint()
-			end, { desc = "Run linter" })
-
-			-- LSP setup
-			local capabilities = vim.tbl_deep_extend(
-				"force",
-				{},
-				vim.lsp.protocol.make_client_capabilities(),
-				require("cmp_nvim_lsp").default_capabilities()
-			)
-
-			-- Mason setup for tools
+			-- Setup mason for tool management
 			require("mason").setup({
-				ui = { border = "rounded" },
+				ui = {
+					border = "rounded",
+					icons = {
+						package_installed = "✓",
+						package_pending = "➜",
+						package_uninstalled = "✗",
+					},
+				},
+			})
+
+			require("mason-lspconfig").setup({
+				ensure_installed = {
+					"ts_ls", -- TypeScript
+					"volar", -- Vue
+					"tailwindcss", -- TailwindCSS
+					"cssls", -- CSS
+					"html", -- HTML
+					"jsonls", -- JSON
+					"yamlls", -- YAML
+					"lua_ls", -- Lua
+					"marksman", -- Markdown
+					"intelephense", -- PHP
+					"emmet_ls", -- Emmet
+					"eslint", -- ESLint
+				},
+				automatic_installation = true,
 			})
 
 			require("mason-tool-installer").setup({
@@ -93,263 +50,20 @@ return {
 					"prettierd",
 					"stylua",
 					"php-cs-fixer",
-					"blade-formatter",
 					-- Linters
 					"eslint_d",
 					"luacheck",
 					"phpstan",
 				},
 				auto_update = true,
+				run_on_start = true,
 			})
 
-			require("mason-lspconfig").setup({
-				ensure_installed = {
-					"lua_ls",
-					"ts_ls",
-					"volar",
-					"tailwindcss",
-					"intelephense",
-					"cssls",
-					"html",
-					"jsonls",
-					"emmet_ls",
-					"eslint",
-					"yamlls",
-				},
-				handlers = {
-					function(server_name)
-						require("lspconfig")[server_name].setup({
-							capabilities = capabilities,
-						})
-					end,
+			-- Setup LSP handlers
+			local capabilities = vim.lsp.protocol.make_client_capabilities()
+			capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 
-					["lua_ls"] = function()
-						require("lspconfig").lua_ls.setup({
-							capabilities = capabilities,
-							settings = {
-								Lua = {
-									completion = { callSnippet = "Replace" },
-									diagnostics = {
-										globals = { "vim", "it", "describe", "before_each", "after_each" },
-									},
-									workspace = { checkThirdParty = false },
-									telemetry = { enable = false },
-								},
-							},
-						})
-					end,
-
-					["ts_ls"] = function()
-						require("lspconfig").ts_ls.setup({
-							capabilities = capabilities,
-							init_options = {
-								preferences = {
-									disableSuggestions = false,
-									includeCompletionsForImportStatements = true,
-								},
-							},
-							settings = {
-								typescript = {
-									inlayHints = {
-										includeInlayParameterNameHints = "all",
-										includeInlayVariableTypeHints = true,
-									},
-								},
-								javascript = {
-									inlayHints = {
-										includeInlayParameterNameHints = "all",
-										includeInlayVariableTypeHints = true,
-									},
-								},
-							},
-						})
-					end,
-
-					["volar"] = function()
-						require("lspconfig").volar.setup({
-							capabilities = capabilities,
-							filetypes = { "vue" },
-							init_options = {
-								vue = { hybridMode = true },
-								typescript = {
-									tsdk = vim.fn.getcwd() .. "/node_modules/typescript/lib",
-								},
-							},
-						})
-					end,
-
-					["tailwindcss"] = function()
-						require("lspconfig").tailwindcss.setup({
-							capabilities = capabilities,
-							filetypes = {
-								"html",
-								"css",
-								"scss",
-								"javascript",
-								"javascriptreact",
-								"typescript",
-								"typescriptreact",
-								"vue",
-								"php",
-								"blade",
-							},
-							init_options = {
-								userLanguages = {
-									blade = "html",
-									vue = "html",
-								},
-							},
-						})
-					end,
-
-					["eslint"] = function()
-						require("lspconfig").eslint.setup({
-							capabilities = capabilities,
-							on_attach = function(_, bufnr)
-								vim.api.nvim_create_autocmd("BufWritePre", {
-									buffer = bufnr,
-									command = "EslintFixAll",
-								})
-							end,
-						})
-					end,
-
-					["intelephense"] = function()
-						require("lspconfig").intelephense.setup({
-							capabilities = capabilities,
-							settings = {
-								intelephense = {
-									environment = {
-										includePaths = { "/vendor" },
-									},
-									files = {
-										maxSize = 5000000,
-									},
-									stubs = {
-										"apache",
-										"bcmath",
-										"Core",
-										"date",
-										"dom",
-										"filter",
-										"mbstring",
-										"mysqli",
-										"openssl",
-										"pcre",
-										"PDO",
-										"PDO_mysql",
-										"session",
-										"standard",
-										"xml",
-										"zip",
-										"laravel",
-										"blade",
-									},
-								},
-							},
-						})
-					end,
-
-					["emmet_ls"] = function()
-						require("lspconfig").emmet_ls.setup({
-							capabilities = capabilities,
-							filetypes = {
-								"html",
-								"css",
-								"scss",
-								"javascript",
-								"javascriptreact",
-								"typescript",
-								"typescriptreact",
-								"vue",
-								"blade",
-								"php",
-							},
-						})
-					end,
-				},
-			})
-
-			-- LSP UI
-			require("fidget").setup({
-				progress = {
-					display = { progress_icon = { pattern = "dots" } },
-				},
-				notification = {
-					window = { winblend = 0 },
-				},
-			})
-
-			require("tailwindcss-colorizer-cmp").setup()
-
-			-- Completion setup
-			local cmp = require("cmp")
-			local luasnip = require("luasnip")
-
-			cmp.setup({
-				snippet = {
-					expand = function(args)
-						luasnip.lsp_expand(args.body)
-					end,
-				},
-				window = {
-					completion = cmp.config.window.bordered(),
-					documentation = cmp.config.window.bordered(),
-				},
-				mapping = cmp.mapping.preset.insert({
-					["<C-p>"] = cmp.mapping.select_prev_item(),
-					["<C-n>"] = cmp.mapping.select_next_item(),
-					["<C-b>"] = cmp.mapping.scroll_docs(-4),
-					["<C-f>"] = cmp.mapping.scroll_docs(4),
-					["<C-y>"] = cmp.mapping.confirm({ select = true }),
-					["<C-Space>"] = cmp.mapping.complete(),
-					["<Tab>"] = cmp.mapping(function(fallback)
-						if cmp.visible() then
-							cmp.select_next_item()
-						elseif luasnip.expand_or_jumpable() then
-							luasnip.expand_or_jump()
-						else
-							fallback()
-						end
-					end, { "i", "s" }),
-					["<S-Tab>"] = cmp.mapping(function(fallback)
-						if cmp.visible() then
-							cmp.select_prev_item()
-						elseif luasnip.jumpable(-1) then
-							luasnip.jump(-1)
-						else
-							fallback()
-						end
-					end, { "i", "s" }),
-				}),
-				sources = cmp.config.sources({
-					{ name = "nvim_lsp", priority = 1000 },
-					{ name = "luasnip", priority = 750 },
-					{ name = "path", priority = 500 },
-					{ name = "buffer", priority = 250 },
-				}),
-				formatting = {
-					format = function(entry, vim_item)
-						-- Set max width of abbr
-						local abbr_max = 30
-						if #vim_item.abbr > abbr_max then
-							vim_item.abbr = string.sub(vim_item.abbr, 1, abbr_max) .. "..."
-						end
-
-						-- Add type info and source
-						vim_item.menu = ({
-							nvim_lsp = "[LSP]",
-							luasnip = "[Snip]",
-							buffer = "[Buf]",
-							path = "[Path]",
-						})[entry.source.name]
-
-						return vim_item
-					end,
-				},
-			})
-
-			-- Diagnostic settings
+			-- Diagnostic configuration
 			vim.diagnostic.config({
 				virtual_text = {
 					prefix = "●",
@@ -359,40 +73,255 @@ return {
 					border = "rounded",
 					source = "always",
 				},
-				update_in_insert = false,
 				severity_sort = true,
+				update_in_insert = false,
 			})
-		end,
-	},
 
-	-- Github Copilot
-	{
-		"zbirenbaum/copilot.lua",
-		event = "InsertEnter",
-		config = function()
-			require("copilot").setup({
-				suggestion = {
-					auto_trigger = true,
-					keymap = {
-						accept = "<Tab>",
-						next = "<M-]>",
-						prev = "<M-[>",
-						dismiss = "<C-]>",
-					},
-				},
-				panel = { enabled = false },
-				filetypes = {
-					markdown = true,
-					help = true,
-				},
-				server_opts_overrides = {
-					settings = {
-						advanced = {
-							telemetry = false,
+			-- Server configurations
+			require("lspconfig").lua_ls.setup({
+				capabilities = capabilities,
+				settings = {
+					Lua = {
+						diagnostics = {
+							globals = { "vim" },
+						},
+						workspace = {
+							checkThirdParty = false,
+						},
+						completion = {
+							callSnippet = "Replace",
 						},
 					},
 				},
 			})
+
+			require("lspconfig").ts_ls.setup({
+				capabilities = capabilities,
+				settings = {
+					typescript = {
+						inlayHints = {
+							includeInlayParameterNameHints = "all",
+							includeInlayPropertyDeclarationTypeHints = true,
+							includeInlayFunctionLikeReturnTypeHints = true,
+						},
+					},
+					javascript = {
+						inlayHints = {
+							includeInlayParameterNameHints = "all",
+							includeInlayPropertyDeclarationTypeHints = true,
+							includeInlayFunctionLikeReturnTypeHints = true,
+						},
+					},
+				},
+			})
+
+			require("lspconfig").tailwindcss.setup({
+				capabilities = capabilities,
+				filetypes = {
+					"html",
+					"css",
+					"scss",
+					"javascript",
+					"javascriptreact",
+					"typescript",
+					"typescriptreact",
+					"vue",
+					"php",
+					"blade",
+				},
+				init_options = {
+					userLanguages = {
+						blade = "html",
+						vue = "html",
+					},
+				},
+			})
+
+			require("lspconfig").volar.setup({
+				capabilities = capabilities,
+				filetypes = { "vue" },
+				init_options = {
+					vue = {
+						hybridMode = true,
+					},
+				},
+			})
+
+			require("lspconfig").intelephense.setup({
+				capabilities = capabilities,
+				settings = {
+					intelephense = {
+						stubs = {
+							"apache",
+							"bcmath",
+							"bz2",
+							"calendar",
+							"Core",
+							"curl",
+							"date",
+							"dba",
+							"dom",
+							"enchant",
+							"fileinfo",
+							"filter",
+							"ftp",
+							"gd",
+							"gettext",
+							"hash",
+							"iconv",
+							"imap",
+							"intl",
+							"json",
+							"ldap",
+							"libxml",
+							"mbstring",
+							"mcrypt",
+							"mysqli",
+							"oci8",
+							"odbc",
+							"openssl",
+							"pcntl",
+							"pcre",
+							"PDO",
+							"pdo_mysql",
+							"pdo_pgsql",
+							"pdo_sqlite",
+							"pgsql",
+							"Phar",
+							"posix",
+							"pspell",
+							"readline",
+							"recode",
+							"reflection",
+							"session",
+							"shmop",
+							"SimpleXML",
+							"snmp",
+							"soap",
+							"sockets",
+							"sodium",
+							"SPL",
+							"sqlite3",
+							"standard",
+							"superglobals",
+							"sysvmsg",
+							"sysvsem",
+							"sysvshm",
+							"tidy",
+							"tokenizer",
+							"xml",
+							"xmlreader",
+							"xmlrpc",
+							"xmlwriter",
+							"xsl",
+							"zip",
+							"zlib",
+							"wordpress",
+							"woocommerce",
+							"acf",
+							"wordpress-globals",
+							"wp-cli",
+							"laravel",
+							"blade",
+						},
+						environment = {
+							includePaths = { "vendor" },
+						},
+						files = {
+							maxSize = 5000000,
+						},
+					},
+				},
+			})
+
+			-- Other servers (simple setup)
+			local servers = {
+				"cssls",
+				"html",
+				"jsonls",
+				"yamlls",
+				"marksman",
+				"emmet_ls",
+				"eslint",
+			}
+
+			for _, server in ipairs(servers) do
+				require("lspconfig")[server].setup({
+					capabilities = capabilities,
+				})
+			end
+		end,
+	},
+
+	-- Formatters and linters
+	{
+		"stevearc/conform.nvim",
+		event = { "BufWritePre" },
+		cmd = { "ConformInfo" },
+		keys = {
+			{
+				"<leader>cf",
+				function()
+					require("conform").format({ async = true, lsp_fallback = true })
+				end,
+				mode = "",
+				desc = "Format buffer",
+			},
+		},
+		opts = {
+			formatters_by_ft = {
+				javascript = { "prettierd" },
+				typescript = { "prettierd" },
+				javascriptreact = { "prettierd" },
+				typescriptreact = { "prettierd" },
+				vue = { "prettierd" },
+				css = { "prettierd" },
+				scss = { "prettierd" },
+				html = { "prettierd" },
+				json = { "prettierd" },
+				yaml = { "prettierd" },
+				markdown = { "prettierd" },
+				lua = { "stylua" },
+				php = { "php_cs_fixer" },
+				blade = { "blade_formatter" },
+			},
+			format_on_save = function(bufnr)
+				-- Don't format on save for files in node_modules or vendor
+				local bufname = vim.api.nvim_buf_get_name(bufnr)
+				if bufname:match("node_modules") or bufname:match("vendor") then
+					return
+				end
+				return { timeout_ms = 500, lsp_fallback = true }
+			end,
+		},
+	},
+
+	-- Linting
+	{
+		"mfussenegger/nvim-lint",
+		event = { "BufReadPre", "BufNewFile" },
+		config = function()
+			local lint = require("lint")
+			lint.linters_by_ft = {
+				javascript = { "eslint_d" },
+				typescript = { "eslint_d" },
+				javascriptreact = { "eslint_d" },
+				typescriptreact = { "eslint_d" },
+				vue = { "eslint_d" },
+				php = { "phpstan" },
+				lua = { "luacheck" },
+			}
+
+			-- Setup autocommand to run linters
+			vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "InsertLeave" }, {
+				callback = function()
+					lint.try_lint()
+				end,
+			})
+
+			vim.keymap.set("n", "<leader>cl", function()
+				lint.try_lint()
+			end, { desc = "Run linter" })
 		end,
 	},
 }

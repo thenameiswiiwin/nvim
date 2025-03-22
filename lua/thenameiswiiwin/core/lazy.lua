@@ -5,18 +5,18 @@ if not vim.loop.fs_stat(lazypath) then
 		"clone",
 		"--filter=blob:none",
 		"https://github.com/folke/lazy.nvim.git",
-		"--branch=stable",
+		"--branch=stable", -- latest stable release
 		lazypath,
 	})
 end
 vim.opt.rtp:prepend(lazypath)
 
-require("lazy").setup({
-	spec = "thenameiswiiwin.plugins",
-	change_detection = { notify = false },
+-- Plugins will be loaded from the plugins directory
+require("lazy").setup("thenameiswiiwin.plugins", {
+	install = {
+		colorscheme = { "catppuccin" },
+	},
 	performance = {
-		cache = { enabled = true },
-		reset_packpath = true,
 		rtp = {
 			disabled_plugins = {
 				"gzip",
@@ -27,16 +27,17 @@ require("lazy").setup({
 				"tohtml",
 				"tutor",
 				"zipPlugin",
-				"rplugin",
-				"spellfile",
-				"man",
-				"shada",
-				"health",
-				"editorconfig",
 			},
 		},
 	},
-	install = { colorscheme = { "catppuccin", "habamax" } },
-	ui = { border = "rounded" },
-	checker = { enabled = true, notify = false },
+	change_detection = {
+		notify = false,
+	},
+	ui = {
+		border = "rounded",
+	},
+	checker = {
+		enabled = true,
+		notify = false,
+	},
 })
