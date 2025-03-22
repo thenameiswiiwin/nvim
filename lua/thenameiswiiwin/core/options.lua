@@ -1,7 +1,7 @@
 local opt = vim.opt
 
 -- Performance
-opt.lazyredraw = true
+opt.lazyredraw = false
 opt.shell = "/bin/zsh"
 vim.g.loaded_python3_provider = 0
 vim.g.loaded_ruby_provider = 0

@@ -10,6 +10,9 @@ return {
 			"windwp/nvim-ts-autotag",
 		},
 		config = function()
+			-- Set the global flag to skip loading the module through treesitter
+			vim.g.skip_ts_context_commentstring_module = true
+
 			require("nvim-treesitter.configs").setup({
 				ensure_installed = {
 					"bash",
@@ -58,7 +61,8 @@ return {
 				},
 				indent = { enable = true },
 				autotag = { enable = true },
-				context_commentstring = { enable = true },
+				-- Remove this line as it's deprecated:
+				-- context_commentstring = { enable = true },
 				incremental_selection = {
 					enable = true,
 					keymaps = {
@@ -119,6 +123,12 @@ return {
 				},
 			})
 
+			local parser_path = vim.fn.stdpath("data") .. "/lazy/nvim-treesitter/parser"
+			vim.opt.runtimepath:append(parser_path)
+
+			require("nvim-treesitter.parsers").get_parser_configs().bash.install_info.path = parser_path
+			require("nvim-treesitter.parsers").get_parser_configs().regex.install_info.path = parser_path
+
 			-- Setup nvim-treesitter-context
 			require("treesitter-context").setup({
 				enable = true,
@@ -128,6 +138,9 @@ return {
 				mode = "cursor",
 				separator = "─",
 			})
+
+			-- Setup ts_context_commentstring separately
+			require("ts_context_commentstring").setup({})
 		end,
 	},
 

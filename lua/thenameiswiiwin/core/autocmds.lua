@@ -8,7 +8,7 @@ local general = augroup("General", { clear = true })
 autocmd("TextYankPost", {
 	group = general,
 	callback = function()
-		vim.highlight.on_yank({ higroup = "IncSearch", timeout = 200 })
+		vim.hl.on_yank({ higroup = "IncSearch", timeout = 200 })
 	end,
 })
 
@@ -101,7 +101,7 @@ autocmd("LspAttach", {
 		vim.keymap.set("n", "<leader>la", vim.lsp.buf.code_action, opts)
 
 		-- Set up formatting
-		if client and client.supports_method("textDocument/formatting") then
+		if client and client:supports_method("textDocument/formatting") then
 			vim.keymap.set("n", "<leader>lf", function()
 				vim.lsp.buf.format({ async = true })
 			end, opts)
