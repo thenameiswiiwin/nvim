@@ -153,23 +153,21 @@ return {
 			local wk = require("which-key")
 			wk.setup(opts)
 
-			-- Using the new registration format
-			wk.register({
-				{
-					mode = { "n", "v" },
-					["<leader>c"] = { group = "code" },
-					["<leader>f"] = { group = "find" },
-					["<leader>g"] = { group = "git" },
-					["<leader>h"] = { group = "harpoon" },
-					["<leader>l"] = { group = "lsp" },
-					["<leader>p"] = { group = "php" },
-					["<leader>q"] = { group = "session" },
-					["<leader>t"] = { group = "test/terminal" },
-					["<leader>w"] = { group = "windows" },
-					["["] = { group = "prev" },
-					["]"] = { group = "next" },
-					["g"] = { group = "goto" },
-				},
+			-- IMPORTANT: We're using add() instead of register() for improved compatibility
+			wk.add({
+				mode = { "n", "v" }, -- Mode must be the first attribute
+				{ "<leader>c", group = "code" },
+				{ "<leader>f", group = "find" },
+				{ "<leader>g", group = "git" },
+				{ "<leader>h", group = "harpoon" },
+				{ "<leader>l", group = "lsp" },
+				{ "<leader>p", group = "php" },
+				{ "<leader>q", group = "session" },
+				{ "<leader>t", group = "test/terminal" },
+				{ "<leader>w", group = "windows" },
+				{ "[", group = "prev" },
+				{ "]", group = "next" },
+				{ "g", group = "goto" },
 			})
 		end,
 	},
