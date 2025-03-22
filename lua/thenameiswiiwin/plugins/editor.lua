@@ -65,7 +65,6 @@ return {
 	{
 		"stevearc/oil.nvim",
 		dependencies = { "nvim-tree/nvim-web-devicons" },
-		-- Load on command or keymap instead of at startup
 		cmd = "Oil",
 		keys = {
 			{ "<leader>e", "<cmd>Oil<cr>", desc = "Open file explorer" },
@@ -81,7 +80,6 @@ return {
 					show_hidden = true,
 					natural_sort = true,
 					sort = {
-						-- Sort by type (directory/file) first, then by name
 						{ "type", "asc" },
 						{ "name", "asc" },
 					},
@@ -173,7 +171,6 @@ return {
 				},
 
 				-- When opening a file, use this method
-				-- Options: 'edit', 'split', 'vsplit', 'tabedit', 'silent_edit'
 				default_file_open_command = "edit",
 
 				-- Restore window options after closing
@@ -182,16 +179,16 @@ return {
 				-- Skip the confirmation pop-up for simple operations
 				skip_confirm_for_simple_edits = false,
 
-				-- Prompt for delete confirmation
-				delete_to_trash = false,
-
-				-- Configuration for permission display
-				lsp_file_methods = {
-					autosave_changes = true,
+				-- Configure trash behavior instead of using trash_command
+				trash = {
+					-- Use the built-in trash implementation
+					cmd = "trash",
+					-- Require confirmation before trashing files
+					require_confirm = true,
 				},
 
-				-- Use trash command instead of rm
-				trash_command = "trash-put",
+				-- Delete to trash setting
+				delete_to_trash = true,
 
 				-- File size formatting
 				size_format = "bs",
@@ -199,108 +196,6 @@ return {
 				-- Use fd instead of find if available
 				use_fd = true,
 			})
-		end,
-	},
-
-	-- Visualize undo branches
-	{
-		"mbbill/undotree",
-		keys = {
-			{ "<leader>u", "<cmd>UndotreeToggle<cr>", desc = "Toggle undotree" },
-		},
-		config = function()
-			vim.g.undotree_WindowLayout = 2
-			vim.g.undotree_SplitWidth = 40
-			vim.g.undotree_DiffpanelHeight = 10
-			vim.g.undotree_SetFocusWhenToggle = 1
-		end,
-	},
-
-	-- Terminal
-	{
-		"akinsho/toggleterm.nvim",
-		version = "*",
-		keys = {
-			{ "<leader>tt", "<cmd>ToggleTerm<cr>", desc = "Toggle terminal" },
-			{ "<leader>th", "<cmd>ToggleTerm direction=horizontal<cr>", desc = "Horizontal terminal" },
-			{ "<leader>tv", "<cmd>ToggleTerm direction=vertical size=40<cr>", desc = "Vertical terminal" },
-			{ "<leader>tf", "<cmd>ToggleTerm direction=float<cr>", desc = "Float terminal" },
-		},
-		opts = {
-			size = function(term)
-				if term.direction == "horizontal" then
-					return 15
-				elseif term.direction == "vertical" then
-					return vim.o.columns * 0.4
-				end
-			end,
-			open_mapping = nil,
-			shade_terminals = false,
-			direction = "float",
-			float_opts = {
-				border = "curved",
-				width = function()
-					return math.floor(vim.o.columns * 0.8)
-				end,
-				height = function()
-					return math.floor(vim.o.lines * 0.8)
-				end,
-			},
-		},
-	},
-
-	-- Quick navigation of buffers
-	{
-		"ThePrimeagen/harpoon",
-		branch = "harpoon2",
-		event = "VeryLazy",
-		dependencies = { "nvim-lua/plenary.nvim" },
-		keys = {
-			{
-				"<leader>ha",
-				function()
-					require("harpoon"):list():append()
-				end,
-				desc = "Harpoon add file",
-			},
-			{
-				"<leader>hl",
-				function()
-					require("harpoon").ui:toggle_quick_menu(require("harpoon"):list())
-				end,
-				desc = "Harpoon quick menu",
-			},
-			{
-				"<leader>h1",
-				function()
-					require("harpoon"):list():select(1)
-				end,
-				desc = "Harpoon file 1",
-			},
-			{
-				"<leader>h2",
-				function()
-					require("harpoon"):list():select(2)
-				end,
-				desc = "Harpoon file 2",
-			},
-			{
-				"<leader>h3",
-				function()
-					require("harpoon"):list():select(3)
-				end,
-				desc = "Harpoon file 3",
-			},
-			{
-				"<leader>h4",
-				function()
-					require("harpoon"):list():select(4)
-				end,
-				desc = "Harpoon file 4",
-			},
-		},
-		config = function()
-			require("harpoon"):setup()
 		end,
 	},
 }
