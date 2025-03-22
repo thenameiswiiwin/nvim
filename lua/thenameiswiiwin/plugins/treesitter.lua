@@ -60,9 +60,7 @@ return {
 					end,
 				},
 				indent = { enable = true },
-				autotag = { enable = true },
-				-- Remove this line as it's deprecated:
-				-- context_commentstring = { enable = true },
+				-- Remove the autotag configuration from here
 				incremental_selection = {
 					enable = true,
 					keymaps = {
@@ -129,18 +127,11 @@ return {
 			require("nvim-treesitter.parsers").get_parser_configs().bash.install_info.path = parser_path
 			require("nvim-treesitter.parsers").get_parser_configs().regex.install_info.path = parser_path
 
-			-- Setup nvim-treesitter-context
-			require("treesitter-context").setup({
-				enable = true,
-				max_lines = 3,
-				min_window_height = 5,
-				line_numbers = true,
-				mode = "cursor",
-				separator = "─",
-			})
-
 			-- Setup ts_context_commentstring separately
 			require("ts_context_commentstring").setup({})
+
+			-- Setup nvim-ts-autotag separately as recommended
+			require("nvim-ts-autotag").setup()
 		end,
 	},
 
@@ -149,5 +140,15 @@ return {
 		"nvim-treesitter/nvim-treesitter-context",
 		dependencies = { "nvim-treesitter/nvim-treesitter" },
 		event = "BufReadPost",
+		config = function()
+			require("treesitter-context").setup({
+				enable = true,
+				max_lines = 3,
+				min_window_height = 5,
+				line_numbers = true,
+				mode = "cursor",
+				separator = "─",
+			})
+		end,
 	},
 }
