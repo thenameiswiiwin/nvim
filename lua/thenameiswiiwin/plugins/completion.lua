@@ -1,161 +1,207 @@
 return {
-	-- Autocompletion
-	{
-		"hrsh7th/nvim-cmp",
-		event = "InsertEnter",
-		dependencies = {
-			-- Sources
-			"hrsh7th/cmp-nvim-lsp",
-			"hrsh7th/cmp-buffer",
-			"hrsh7th/cmp-path",
-			"hrsh7th/cmp-cmdline",
-			"saadparwaiz1/cmp_luasnip",
-			-- Snippets
-			"L3MON4D3/LuaSnip",
-			"rafamadriz/friendly-snippets",
-			-- Icons
-			"onsails/lspkind.nvim",
-		},
-		config = function()
-			local cmp = require("cmp")
-			local luasnip = require("luasnip")
-			local lspkind = require("lspkind")
+  {
+    "hrsh7th/nvim-cmp",
+    dependencies = {
+      -- Sources
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-path",
+      "hrsh7th/cmp-cmdline",
 
-			-- Load snippets
-			require("luasnip.loaders.from_vscode").lazy_load()
+      -- Snippets
+      "L3MON4D3/LuaSnip",
+      "saadparwaiz1/cmp_luasnip",
+      "rafamadriz/friendly-snippets",
 
-			-- Add specific language snippets
-			luasnip.filetype_extend("javascript", { "jsdoc" })
-			luasnip.filetype_extend("typescript", { "jsdoc", "tsdoc" })
-			luasnip.filetype_extend("vue", { "html", "javascript", "typescript" })
-			luasnip.filetype_extend("php", { "php", "html" })
-			luasnip.filetype_extend("blade.php", { "html", "php" })
+      -- Icons
+      "onsails/lspkind.nvim",
 
-			-- Setup completion
-			cmp.setup({
-				snippet = {
-					expand = function(args)
-						luasnip.lsp_expand(args.body)
-					end,
-				},
-				window = {
-					completion = cmp.config.window.bordered({
-						scrollbar = false,
-						winhighlight = "Normal:CmpPmenu,CursorLine:CmpSel,Search:None",
-					}),
-					documentation = cmp.config.window.bordered({
-						winhighlight = "Normal:CmpDoc",
-					}),
-				},
-				formatting = {
-					format = lspkind.cmp_format({
-						mode = "symbol_text",
-						maxwidth = 50,
-						ellipsis_char = "...",
-						menu = {
-							buffer = "[Buf]",
-							nvim_lsp = "[LSP]",
-							luasnip = "[Snip]",
-							path = "[Path]",
-							nvim_lua = "[Lua]",
-						},
-					}),
-				},
-				mapping = cmp.mapping.preset.insert({
-					["<C-n>"] = cmp.mapping.select_next_item(),
-					["<C-p>"] = cmp.mapping.select_prev_item(),
-					["<C-d>"] = cmp.mapping.scroll_docs(4),
-					["<C-u>"] = cmp.mapping.scroll_docs(-4),
-					["<C-Space>"] = cmp.mapping.complete(),
-					["<C-e>"] = cmp.mapping.abort(),
-					["<CR>"] = cmp.mapping.confirm({
-						behavior = cmp.ConfirmBehavior.Replace,
-						select = false,
-					}),
-					-- Snippet navigation
-					["<Tab>"] = cmp.mapping(function(fallback)
-						if cmp.visible() then
-							cmp.select_next_item()
-						elseif luasnip.expand_or_locally_jumpable() then
-							luasnip.expand_or_jump()
-						else
-							fallback()
-						end
-					end, { "i", "s" }),
-					["<S-Tab>"] = cmp.mapping(function(fallback)
-						if cmp.visible() then
-							cmp.select_prev_item()
-						elseif luasnip.jumpable(-1) then
-							luasnip.jump(-1)
-						else
-							fallback()
-						end
-					end, { "i", "s" }),
-				}),
-				sources = cmp.config.sources({
-					{ name = "nvim_lsp", priority = 1000 },
-					{ name = "luasnip", priority = 750 },
-					{ name = "buffer", priority = 500 },
-					{ name = "path", priority = 250 },
-				}),
-			})
+      -- Copilot
+      "zbirenbaum/copilot.lua",
+      "zbirenbaum/copilot-cmp",
+    },
+    config = function()
+      local cmp = require("cmp")
+      local luasnip = require("luasnip")
+      local lspkind = require("lspkind")
 
-			-- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
-			cmp.setup.cmdline({ "/", "?" }, {
-				mapping = cmp.mapping.preset.cmdline(),
-				sources = {
-					{ name = "buffer" },
-				},
-			})
+      -- Load friendly snippets
+      require("luasnip.loaders.from_vscode").lazy_load()
 
-			-- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-			cmp.setup.cmdline(":", {
-				mapping = cmp.mapping.preset.cmdline(),
-				sources = cmp.config.sources({
-					{ name = "path" },
-					{ name = "cmdline" },
-				}),
-			})
-		end,
-	},
+      -- Configure Copilot
+      require("copilot").setup({
+        suggestion = {
+          enabled = true,
+          auto_trigger = false,
+          hide_during_completion = false,
+          debounce = 25,
+          keymap = {
+            accept = false,
+            accept_word = false,
+            accept_line = "<Tab>",
+            next = false,
+            prev = false,
+            dismiss = false,
+          },
+        },
+        panel = { enabled = false },
+      })
 
-	-- AI Copilot
-	{
-		"zbirenbaum/copilot.lua",
-		cmd = "Copilot",
-		event = "InsertEnter",
-		config = function()
-			require("copilot").setup({
-				panel = {
-					enabled = true,
-					auto_refresh = true,
-				},
-				suggestion = {
-					enabled = true,
-					auto_trigger = true,
-					accept_word = false,
-					accept_line = false,
-					keymap = {
-						accept = "<Tab>",
-						accept_word = false,
-						accept_line = false,
-						next = "<M-]>",
-						prev = "<M-[>",
-						dismiss = "<C-]>",
-					},
-				},
-				filetypes = {
-					yaml = true,
-					markdown = true,
-					help = false,
-					gitcommit = false,
-					gitrebase = false,
-					hgcommit = false,
-					svn = false,
-					cvs = false,
-					["."] = false,
-				},
-			})
-		end,
-	},
+      -- Configure Copilot CMP integration
+      require("copilot_cmp").setup()
+
+      -- Helper function for super tab functionality (inspired by LunarVim)
+      local has_words_before = function()
+        unpack = unpack or table.unpack
+        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+        return col ~= 0
+            and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+      end
+
+      -- Define the snippet expand function
+      local function expand_snippet(fallback)
+        if luasnip.expandable() then
+          luasnip.expand()
+        else
+          fallback()
+        end
+      end
+
+      -- Define the snippet jump functions
+      local function jump_next(fallback)
+        if luasnip.expand_or_jumpable() then
+          luasnip.expand_or_jump()
+        elseif has_words_before() then
+          cmp.complete()
+        else
+          fallback()
+        end
+      end
+
+      local function jump_prev(fallback)
+        if luasnip.jumpable(-1) then
+          luasnip.jump(-1)
+        else
+          fallback()
+        end
+      end
+
+      -- Set up nvim-cmp
+      cmp.setup({
+        snippet = {
+          expand = function(args)
+            luasnip.lsp_expand(args.body)
+          end,
+        },
+        window = {
+          completion = {
+            border = "rounded",
+            winhighlight = "Normal:CmpNormal",
+          },
+          documentation = {
+            border = "rounded",
+            winhighlight = "Normal:CmpDocNormal",
+          },
+        },
+        mapping = cmp.mapping.preset.insert({
+          -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+          ["<C-y>"] = cmp.mapping.confirm({ select = true }),
+
+          -- Super Tab functionality
+          ["<Tab>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_next_item()
+            else
+              jump_next(fallback)
+            end
+          end, { "i", "s" }),
+
+          ["<S-Tab>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_prev_item()
+            else
+              jump_prev(fallback)
+            end
+          end, { "i", "s" }),
+
+          -- Scroll documentation
+          ["<C-d>"] = cmp.mapping.scroll_docs(4),
+          ["<C-u>"] = cmp.mapping.scroll_docs(-4),
+
+          -- Toggle completion
+          ["<C-Space>"] = cmp.mapping.complete(),
+
+          -- Abort completion
+          ["<C-e>"] = cmp.mapping.abort(),
+
+          -- Previous/next item
+          ["<C-p>"] = cmp.mapping.select_prev_item(),
+          ["<C-n>"] = cmp.mapping.select_next_item(),
+        }),
+        sources = cmp.config.sources({
+          { name = "copilot",  group_index = 2 }, -- Copilot suggestions
+          { name = "nvim_lsp", group_index = 2 }, -- LSP suggestions
+          { name = "luasnip",  group_index = 2 }, -- Snippets
+          { name = "path",     group_index = 3 }, -- File paths
+        }, {
+          { name = "buffer" },               -- Buffer text
+        }),
+        formatting = {
+          format = lspkind.cmp_format({
+            mode = "symbol_text",
+            maxwidth = 50,
+            ellipsis_char = "...",
+            show_labelDetails = true,
+            symbol_map = {
+              Copilot = "",
+            },
+          }),
+        },
+        sorting = {
+          priority_weight = 2,
+          comparators = {
+            -- Put copilot at the beginning
+            require("copilot_cmp.comparators").prioritize,
+
+            -- Default comparators
+            cmp.config.compare.offset,
+            cmp.config.compare.exact,
+            cmp.config.compare.score,
+            cmp.config.compare.recently_used,
+            cmp.config.compare.kind,
+            cmp.config.compare.sort_text,
+            cmp.config.compare.length,
+            cmp.config.compare.order,
+          },
+        },
+        experimental = {
+          ghost_text = false, -- We use Copilot's ghost text instead
+        },
+      })
+
+      -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
+      cmp.setup.cmdline({ "/", "?" }, {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = {
+          { name = "buffer" },
+        },
+      })
+
+      -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+      cmp.setup.cmdline(":", {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = cmp.config.sources({
+          { name = "path" },
+        }, {
+          { name = "cmdline" },
+        }),
+      })
+
+      -- Set up filetype-specific snippets
+      luasnip.filetype_extend("typescript", { "javascript" })
+      luasnip.filetype_extend("typescriptreact", { "javascript", "react" })
+      luasnip.filetype_extend("javascriptreact", { "javascript", "react" })
+      luasnip.filetype_extend("vue", { "javascript", "html", "css" })
+    end,
+  },
 }

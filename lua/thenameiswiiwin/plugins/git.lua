@@ -1,26 +1,14 @@
 return {
-	-- Git integration
+	-- Git signs in the gutter
 	{
 		"lewis6991/gitsigns.nvim",
-		event = { "BufReadPre", "BufNewFile" },
 		opts = {
 			signs = {
-				add = { text = "│" },
-				change = { text = "│" },
-				delete = { text = "󰍵" },
+				add = { text = "+" },
+				change = { text = "~" },
+				delete = { text = "_" },
 				topdelete = { text = "‾" },
 				changedelete = { text = "~" },
-				untracked = { text = "│" },
-			},
-			current_line_blame = true,
-			current_line_blame_opts = {
-				virt_text = true,
-				virt_text_pos = "eol",
-				delay = 300,
-			},
-			preview_config = {
-				border = "rounded",
-				style = "minimal",
 			},
 			on_attach = function(bufnr)
 				local gs = package.loaded.gitsigns
@@ -31,73 +19,105 @@ return {
 					vim.keymap.set(mode, l, r, opts)
 				end
 
-				-- Navigation
-				map("n", "]c", function()
+				-- Navigation between hunks
+				map("n", "]g", function()
 					if vim.wo.diff then
-						return "]c"
+						return "]g"
 					end
 					vim.schedule(function()
 						gs.next_hunk()
 					end)
 					return "<Ignore>"
-				end, { expr = true })
+				end, { expr = true, desc = "Next Git hunk" })
 
-				map("n", "[c", function()
+				map("n", "[g", function()
 					if vim.wo.diff then
-						return "[c"
+						return "[g"
 					end
 					vim.schedule(function()
 						gs.prev_hunk()
 					end)
 					return "<Ignore>"
-				end, { expr = true })
+				end, { expr = true, desc = "Previous Git hunk" })
 
 				-- Actions
-				map("n", "<leader>gs", gs.stage_hunk, { desc = "Git stage hunk" })
-				map("n", "<leader>gr", gs.reset_hunk, { desc = "Git reset hunk" })
-				map("v", "<leader>gs", function()
+				map("n", "<leader>hs", gs.stage_hunk, { desc = "Stage hunk" })
+				map("n", "<leader>hr", gs.reset_hunk, { desc = "Reset hunk" })
+				map("v", "<leader>hs", function()
 					gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
-				end, { desc = "Git stage selected hunk" })
-				map("v", "<leader>gr", function()
+				end, { desc = "Stage selected hunk" })
+				map("v", "<leader>hr", function()
 					gs.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
-				end, { desc = "Git reset selected hunk" })
-				map("n", "<leader>gS", gs.stage_buffer, { desc = "Git stage buffer" })
-				map("n", "<leader>gu", gs.undo_stage_hunk, { desc = "Git undo stage hunk" })
-				map("n", "<leader>gR", gs.reset_buffer, { desc = "Git reset buffer" })
-				map("n", "<leader>gp", gs.preview_hunk, { desc = "Git preview hunk" })
-				map("n", "<leader>gl", gs.blame_line, { desc = "Git blame line" })
-				map("n", "<leader>gb", function()
+				end, { desc = "Reset selected hunk" })
+				map("n", "<leader>hS", gs.stage_buffer, { desc = "Stage buffer" })
+				map("n", "<leader>hu", gs.undo_stage_hunk, { desc = "Undo stage hunk" })
+				map("n", "<leader>hR", gs.reset_buffer, { desc = "Reset buffer" })
+				map("n", "<leader>hp", gs.preview_hunk, { desc = "Preview hunk" })
+				map("n", "<leader>hb", function()
 					gs.blame_line({ full = true })
-				end, { desc = "Git blame line (full)" })
-				map("n", "<leader>gd", gs.diffthis, { desc = "Git diff this" })
-				map("n", "<leader>gD", function()
+				end, { desc = "Blame line" })
+				map("n", "<leader>tb", gs.toggle_current_line_blame, { desc = "Toggle line blame" })
+				map("n", "<leader>hd", gs.diffthis, { desc = "Diff this" })
+				map("n", "<leader>hD", function()
 					gs.diffthis("~")
-				end, { desc = "Git diff this ~" })
+				end, { desc = "Diff this ~" })
 				map("n", "<leader>td", gs.toggle_deleted, { desc = "Toggle deleted" })
 			end,
 		},
 	},
 
+	-- Fugitive for Git commands
+	{
+		"tpope/vim-fugitive",
+		config = function()
+			-- Shortcuts for common fugitive commands
+			vim.keymap.set("n", "<leader>gs", vim.cmd.Git, { desc = "Git status" })
+			vim.keymap.set("n", "<leader>gc", ":Git commit<CR>", { desc = "Git commit" })
+			vim.keymap.set("n", "<leader>gp", ":Git push<CR>", { desc = "Git push" })
+			vim.keymap.set("n", "<leader>gl", ":Git pull --rebase<CR>", { desc = "Git pull (rebase)" })
+			vim.keymap.set("n", "<leader>gb", ":Git blame<CR>", { desc = "Git blame" })
+
+			-- Set up autocmds for fugitive buffers
+			local Fugitive = vim.api.nvim_create_augroup("Fugitive", {})
+
+			vim.api.nvim_create_autocmd("BufWinEnter", {
+				group = Fugitive,
+				pattern = "*",
+				callback = function()
+					if vim.bo.ft ~= "fugitive" then
+						return
+					end
+
+					local bufnr = vim.api.nvim_get_current_buf()
+					local opts = { buffer = bufnr, remap = false }
+
+					-- Additional keymaps in fugitive window
+					vim.keymap.set("n", "<leader>p", function()
+						vim.cmd.Git("push")
+					end, opts)
+
+					vim.keymap.set("n", "<leader>P", function()
+						vim.cmd.Git({ "pull", "--rebase" })
+					end, opts)
+
+					vim.keymap.set("n", "<leader>t", ":Git push -u origin ", opts)
+				end,
+			})
+
+			-- Keymaps for merge conflict resolution
+			vim.keymap.set("n", "<leader>gh", "<cmd>diffget //2<CR>", { desc = "Get diff from target branch" })
+			vim.keymap.set("n", "<leader>gl", "<cmd>diffget //3<CR>", { desc = "Get diff from merge branch" })
+		end,
+	},
+
 	-- LazyGit integration
 	{
 		"kdheepak/lazygit.nvim",
-		cmd = "LazyGit",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 		},
-		keys = {
-			{ "<leader>gg", "<cmd>LazyGit<cr>", desc = "LazyGit" },
-		},
-	},
-
-	-- Fugitive (Git commands)
-	{
-		"tpope/vim-fugitive",
-		cmd = { "Git", "Gstatus", "Gblame", "Gpush", "Gpull" },
-		keys = {
-			{ "<leader>gc", "<cmd>Git commit<cr>", desc = "Git commit" },
-			{ "<leader>gp", "<cmd>Git push<cr>", desc = "Git push" },
-			{ "<leader>gP", "<cmd>Git pull<cr>", desc = "Git pull" },
-		},
+		config = function()
+			vim.keymap.set("n", "<leader>gg", "<cmd>LazyGit<cr>", { desc = "Open LazyGit" })
+		end,
 	},
 }
