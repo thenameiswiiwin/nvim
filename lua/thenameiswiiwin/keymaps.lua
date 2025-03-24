@@ -53,7 +53,7 @@ vim.keymap.set("n", "<leader>el", 'oif err != nil {<CR>}<Esc>Olog.Error("error",
 
 -- Reload config
 vim.keymap.set("n", "<leader><leader>", function()
-	vim.cmd("so")
+  vim.cmd("so")
 end)
 
 -- Oil file explorer

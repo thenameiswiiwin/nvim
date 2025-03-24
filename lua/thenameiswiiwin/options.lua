@@ -32,7 +32,7 @@ opt.incsearch = true -- Show search matches as you type
 opt.termguicolors = true
 
 -- UI improvements
-opt.scrolloff = 8 -- Keep 8 lines visible above/below cursor
+opt.scrolloff = 8      -- Keep 8 lines visible above/below cursor
 opt.signcolumn = "yes" -- Always show sign column
 opt.isfname:append("@-@")
 
@@ -51,8 +51,8 @@ opt.splitbelow = true
 
 -- Grep using ripgrep if available
 if vim.fn.executable("rg") == 1 then
-	opt.grepprg = "rg --vimgrep --smart-case --hidden"
-	opt.grepformat = "%f:%l:%c:%m"
+  opt.grepprg = "rg --vimgrep --smart-case --hidden"
+  opt.grepformat = "%f:%l:%c:%m"
 end
 
 -- Set leader key (must happen early)
@@ -64,17 +64,17 @@ opt.cmdheight = 1
 
 -- Configure diagnostics display
 vim.diagnostic.config({
-	virtual_text = {
-		prefix = "●", -- Add a small icon to diagnostics
-	},
-	signs = true,
-	underline = true,
-	update_in_insert = false,
-	severity_sort = true,
-	float = {
-		border = "rounded",
-		source = "always",
-	},
+  virtual_text = {
+    prefix = "●", -- Add a small icon to diagnostics
+  },
+  signs = true,
+  underline = true,
+  update_in_insert = false,
+  severity_sort = true,
+  float = {
+    border = "rounded",
+    source = "always",
+  },
 })
 
 -- Line number and sign column colors
