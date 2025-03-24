@@ -257,7 +257,7 @@ This guide will walk you through all the features of your optimized Neovim confi
 
 - `<leader>1-5` (Jump to Harpoon files): Instantly jumps to the corresponding marked file. Use these shortcuts when you know exactly which marked file you want to open (1st, 2nd, etc.).
 
-- `<C-n>` / `<C-p>` (Next/previous Harpoon file): Cycles through your marked files. Use these when you're iterating through your set of important files.
+- `<leader>hn` / `<leader>hp` (Next/previous Harpoon file): Cycles through your marked files. Use these when you're iterating through your set of important files.
 
 #### Split Management
 

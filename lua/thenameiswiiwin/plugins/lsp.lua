@@ -92,21 +92,17 @@ return {
           sh = { "shfmt" },
         },
 
-        -- Stop after first formatter succeeds
+        -- Format on save configuration - merged both implementations
         format_on_save = function(bufnr)
           -- Disable with a global or buffer-local variable
           if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
             return
           end
-          return { timeout_ms = 500, lsp_fallback = true, stop_after_first = true }
-        end,
-        -- Set up format-on-save
-        format_on_save = function(bufnr)
-          -- Disable with a global or buffer-local variable
-          if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
-            return
-          end
-          return { timeout_ms = 500, lsp_fallback = true }
+          return {
+            timeout_ms = 500,
+            lsp_fallback = true,
+            stop_after_first = true, -- Keep the "stop_after_first" setting
+          }
         end,
       })
 
