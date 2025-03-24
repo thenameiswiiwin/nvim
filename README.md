@@ -93,7 +93,7 @@ This guide will walk you through all the features of your optimized Neovim confi
 **Features**:
 
 - Configured with your requested settings (not auto-triggering)
-- Accept line suggestions with Tab
+- Accept line suggestions with `<C-CR>` (Ctrl+Enter)
 - Works alongside traditional LSP completions
 - Prioritized in completion menu
 
@@ -291,6 +291,12 @@ This guide will walk you through all the features of your optimized Neovim confi
 
 - `<leader>el`: Inserts error logging snippet. Use this when you need to add error logging to your code.
 
+### Quickfix Navigation
+
+- `<leader>qn` / `<leader>qp`: Navigate to next/previous item in the quickfix list. Use these to move through compilation errors, search results, or other items in the quickfix list.
+
+- `<leader>k` / `<leader>j`: Navigate to next/previous item in the location list. Use these for localized lists of diagnostics or search results.
+
 ### LSP Features
 
 #### Code Navigation
@@ -317,9 +323,23 @@ This guide will walk you through all the features of your optimized Neovim confi
 
 ### Git Operations
 
-- `<leader>gs` (Git status): Opens Fugitive for Git status view. Use this to see all changes in your repository and stage/unstage files.
+#### Fugitive Commands (Prefix: `<leader>gf`)
+
+- `<leader>gfs` (Fugitive: Git status): Opens Fugitive for Git status view. Use this to see all changes in your repository and stage/unstage files.
+
+- `<leader>gfc` (Fugitive: Git commit): Initiates a commit through Fugitive. Use this when you're ready to commit your staged changes.
+
+- `<leader>gfp` (Fugitive: Git push): Pushes your changes to the remote repository. Use this after committing to share your changes.
+
+- `<leader>gfl` (Fugitive: Git pull): Pulls changes from the remote repository with rebase. Use this to keep your local repository up to date.
+
+- `<leader>gfb` (Fugitive: Git blame): Shows blame information for the current file. Use this to see who last modified each line of code.
+
+#### LazyGit
 
 - `<leader>gg` (LazyGit): Opens the LazyGit interface. Use this for a comprehensive Git UI when performing complex Git operations.
+
+#### Gitsigns Navigation and Actions
 
 - `]g` / `[g`: Navigate to next/previous Git hunk (changed section). Use these to review changes in your code.
 
@@ -357,6 +377,14 @@ This guide will walk you through all the features of your optimized Neovim confi
 
 - `<leader>zZ` (Full Zen mode): Toggles a completely distraction-free mode. Use this when you need maximum focus and don't need line numbers.
 
+### Treesitter Text Object Manipulation
+
+- `<leader>ws` / `<leader>wS`: Swap next/previous parameter. Use these to quickly reorganize function parameters.
+
+- `<leader>wf` / `<leader>wF`: Swap next/previous function. Use these to rearrange function declarations.
+
+- `<leader>wm` / `<leader>wM`: Swap next/previous method call. Use these to reorganize method chains.
+
 ### Additional Utilities
 
 - `<leader>u` (Undotree): Opens the undo history visualizer. Use this when you need to navigate through complex edit history.
@@ -379,7 +407,7 @@ This guide will walk you through all the features of your optimized Neovim confi
 4. When coding, use LSP features for auto-completion and diagnostics
 5. Use `<leader>s` for quick refactoring of variable or function names
 6. Run tests with `<leader>tt` or `<leader>tf` to verify changes
-7. Use Git integration (`<leader>gg` or `<leader>gs`) to stage and commit changes
+7. Use Git integration (`<leader>gg` or `<leader>gfs`) to stage and commit changes
 8. Navigate back to other files using Harpoon shortcuts (`<leader>1-5`)
 
 ### Debugging Workflow
