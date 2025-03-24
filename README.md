@@ -65,6 +65,7 @@ This guide will walk you through all the features of your optimized Neovim confi
 - Automatically hides in certain buffers where it's not needed
 - Integrates with plugins to show relevant status information
 - Uses Catppuccin theme for visual consistency
+- Displays LSP progress indicators in real-time
 
 ### 5. LSP (Language Server Protocol) Configuration
 
@@ -83,6 +84,9 @@ This guide will walk you through all the features of your optimized Neovim confi
 - Navigation to definitions, references, and implementations
 - Rename symbols across files
 - Signature help when writing function calls
+- Inlay Hints: Shows type information and parameter names directly in your code
+- LSP Progress Indicator: Displays real-time feedback on LSP operations in your statusline
+- Enhanced TypeScript Support: Specialized tools for TypeScript with deeper language understanding
 
 ### 6. GitHub Copilot Integration
 
@@ -92,10 +96,13 @@ This guide will walk you through all the features of your optimized Neovim confi
 
 **Features**:
 
-- Configured with your requested settings (not auto-triggering)
+- Auto-triggering with configurable keyboard shortcuts
 - Accept line suggestions with `<C-CR>` (Ctrl+Enter)
+- Accept word suggestions with `<M-k>` (Alt+k)
+- Accept full suggestions with `<M-l>` (Alt+l)
 - Works alongside traditional LSP completions
-- Prioritized in completion menu
+- Suggestions panel with `<M-CR>` (Alt+Enter)
+- Ghost Text Preview: Shows completions directly in your code before accepting them
 
 ### 7. Testing Framework (Neotest)
 
@@ -197,6 +204,10 @@ This guide will walk you through all the features of your optimized Neovim confi
 - Incremental selection based on syntax nodes
 - Language-aware indentation
 - Support for all your primary languages
+- Smart Code Folding: Intelligent code folding based on language structure
+- Rainbow Delimiters: Color-coded matching brackets and braces for easier visualization
+- Advanced Refactoring: Enhanced tools for renaming, navigation, and code transformation
+- Treesitter Playground: Debugging tool for examining syntax tree and language queries
 
 ### 13. Completion System (nvim-cmp)
 
@@ -213,6 +224,8 @@ This guide will walk you through all the features of your optimized Neovim confi
 - Buffer text completions
 - Customizable sorting and filtering
 - Icons and documentation display
+- Additional Completion Sources: Emoji, calculations, and Neovim Lua API
+- Ghost Text Preview: Shows completions directly in the editor before accepting
 
 ### 14. Debug Adapter Protocol (DAP)
 
@@ -307,6 +320,8 @@ This guide will walk you through all the features of your optimized Neovim confi
 
 - `K` (Hover information): Shows documentation for the symbol under cursor. Use this to quickly check function signatures, type information, or documentation without leaving your current position.
 
+- `<leader>th` (Toggle inlay hints): Toggles type hints and parameter names inline in your code. Use this when you want additional context about types without hovering.
+
 #### Code Actions
 
 - `<leader>ca` (Code actions): Shows available actions for fixing or modifying code. Use this when you see an error or warning and want to see automatic fix options.
@@ -377,13 +392,31 @@ This guide will walk you through all the features of your optimized Neovim confi
 
 - `<leader>zZ` (Full Zen mode): Toggles a completely distraction-free mode. Use this when you need maximum focus and don't need line numbers.
 
-### Treesitter Text Object Manipulation
+### Treesitter Text Object and Navigation
 
 - `<leader>ws` / `<leader>wS`: Swap next/previous parameter. Use these to quickly reorganize function parameters.
 
 - `<leader>wf` / `<leader>wF`: Swap next/previous function. Use these to rearrange function declarations.
 
 - `<leader>wm` / `<leader>wM`: Swap next/previous method call. Use these to reorganize method chains.
+
+- `<leader>tr` (Smart rename): Performs a treesitter-aware rename of the symbol under cursor, respecting the language semantics. Use this for more accurate renaming.
+
+- `gnd` (Go to definition): Uses treesitter to jump to the definition of a symbol. Useful when LSP is not available.
+
+- `gnD` (List definitions): Shows all definitions of the current symbol in the project.
+
+- `gO` (List definitions TOC): Displays a table of contents of all definitions in the current file.
+
+- `<a-*>` / `<a-#>` (Next/previous usage): Navigates between usages of the current symbol. Useful for reviewing how a function or variable is used.
+
+### Folding
+
+- `zR` (Open all folds): Expands all code folds in the current buffer. Use this to see the entire file.
+
+- `zM` (Close all folds): Collapses all code sections. Use this for getting an overview of the file structure.
+
+- `zr` (Open folds except kinds): Selectively opens folds. Useful when you want to focus on specific types of code blocks.
 
 ### Additional Utilities
 
@@ -397,6 +430,8 @@ This guide will walk you through all the features of your optimized Neovim confi
 
 - `<leader>xX` (Trouble workspace diagnostics): Opens the Trouble panel with project-wide diagnostics. Use this to see all issues across your project.
 
+- `<leader>ts` (Toggle TS Playground): Opens the Treesitter Playground for debugging syntax trees and queries.
+
 ## Advanced Usage Scenarios
 
 ### Web Development Workflow
@@ -409,6 +444,18 @@ This guide will walk you through all the features of your optimized Neovim confi
 6. Run tests with `<leader>tt` or `<leader>tf` to verify changes
 7. Use Git integration (`<leader>gg` or `<leader>gfs`) to stage and commit changes
 8. Navigate back to other files using Harpoon shortcuts (`<leader>1-5`)
+
+### TypeScript Development with Enhanced Features
+
+1. Navigate to your TypeScript project
+2. Use `<leader>ff` to find a specific file
+3. While coding, notice inlay hints showing parameter names and return types
+4. Use `<leader>th` to toggle these hints if they become distracting
+5. When refactoring, use `<leader>tr` for smart renaming across the codebase
+6. Navigate between usages with `<a-*>` and `<a-#>`
+7. Use the ghost text preview for faster completion with Copilot
+8. When facing complex nested code, rely on rainbow delimiters to visually match brackets
+9. For a cleaner view, use `zM` to collapse all functions and `zR` to expand again
 
 ### Debugging Workflow
 
