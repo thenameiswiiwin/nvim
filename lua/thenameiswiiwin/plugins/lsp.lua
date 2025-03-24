@@ -16,6 +16,15 @@ return {
       -- For formatters and linters
       "stevearc/conform.nvim",
       "mfussenegger/nvim-lint",
+
+      -- LSP Progress indicator
+      "linrongbin16/lsp-progress.nvim",
+
+      -- TypeScript tools for enhanced experience
+      {
+        "pmizio/typescript-tools.nvim",
+        dependencies = { "nvim-lua/plenary.nvim" },
+      },
     },
     config = function()
       -- Setup neovim lua configuration
@@ -91,7 +100,7 @@ return {
           sh = { "shfmt" },
         },
 
-        -- Format on save configuration - merged both implementations
+        -- Format on save configuration
         format_on_save = function(bufnr)
           -- Disable with a global or buffer-local variable
           if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
@@ -100,7 +109,7 @@ return {
           return {
             timeout_ms = 500,
             lsp_fallback = true,
-            stop_after_first = true, -- Keep the "stop_after_first" setting
+            stop_after_first = true,
           }
         end,
       })
@@ -124,8 +133,6 @@ return {
           )
         end
       end, { desc = "Toggle autoformatting", bang = true })
-
-      -- LSP Keymaps are in init.lua in the LspAttach autocmd
 
       -- Configure diagnostic display
       vim.diagnostic.config({
@@ -189,6 +196,38 @@ return {
           end,
         },
       })
+
+      -- Setup TypeScript tools for enhanced experience
+      require("typescript-tools").setup({
+        settings = {
+          tsserver_file_preferences = {
+            includeInlayParameterNameHints = "all",
+            includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+            includeInlayFunctionParameterTypeHints = true,
+            includeInlayVariableTypeHints = true,
+            includeInlayPropertyDeclarationTypeHints = true,
+            includeInlayFunctionLikeReturnTypeHints = true,
+          },
+        },
+      })
+
+      -- Setup LSP Progress
+      require("lsp-progress").setup()
+
+      -- Register autocmd for LSP attach to enable inlay hints
+      vim.api.nvim_create_autocmd("LspAttach", {
+        callback = function(args)
+          local client = vim.lsp.get_client_by_id(args.data.client_id)
+          if client and client.supports_method("textDocument/inlayHint") then
+            vim.lsp.inlay_hint.enable(args.buf, true)
+          end
+        end,
+      })
+
+      -- Add keybinding to toggle inlay hints
+      vim.keymap.set("n", "<leader>th", function()
+        vim.lsp.inlay_hint.enable(0, not vim.lsp.inlay_hint.is_enabled(0))
+      end, { desc = "Toggle inlay hints" })
     end,
   },
 }

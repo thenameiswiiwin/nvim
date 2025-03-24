@@ -7,6 +7,9 @@ return {
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-path",
       "hrsh7th/cmp-cmdline",
+      "hrsh7th/cmp-nvim-lua", -- For Neovim Lua API
+      "hrsh7th/cmp-calc",  -- For calculations
+      "hrsh7th/cmp-emoji", -- For emoji support
 
       -- Snippets
       "L3MON4D3/LuaSnip",
@@ -34,7 +37,7 @@ return {
           enabled = true,
           auto_trigger = false,
           hide_during_completion = false,
-          debounce = 25,
+          debounce = 150,
           keymap = {
             accept = false,
             accept_word = false,
@@ -44,13 +47,15 @@ return {
             dismiss = false,
           },
         },
-        panel = { enabled = false },
+        panel = {
+          enabled = false,
+        },
       })
 
       -- Configure Copilot CMP integration
       require("copilot_cmp").setup()
 
-      -- Helper function for super tab functionality (inspired by LunarVim)
+      -- Helper function for super tab functionality
       local has_words_before = function()
         unpack = unpack or table.unpack
         local line, col = unpack(vim.api.nvim_win_get_cursor(0))
@@ -143,6 +148,9 @@ return {
           { name = "nvim_lsp", group_index = 2 }, -- LSP suggestions
           { name = "luasnip",  group_index = 2 }, -- Snippets
           { name = "path",     group_index = 3 }, -- File paths
+          { name = "nvim_lua", group_index = 3 }, -- Neovim Lua API
+          { name = "calc",     group_index = 3 }, -- Calculations
+          { name = "emoji",    group_index = 3 }, -- Emoji
         }, {
           { name = "buffer" },               -- Buffer text
         }),
@@ -175,11 +183,11 @@ return {
           },
         },
         experimental = {
-          ghost_text = false, -- We use Copilot's ghost text instead
+          ghost_text = true, -- Enable ghost text
         },
       })
 
-      -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
+      -- Use buffer source for `/` and `?`
       cmp.setup.cmdline({ "/", "?" }, {
         mapping = cmp.mapping.preset.cmdline(),
         sources = {
@@ -187,7 +195,7 @@ return {
         },
       })
 
-      -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+      -- Use cmdline & path source for ':'
       cmp.setup.cmdline(":", {
         mapping = cmp.mapping.preset.cmdline(),
         sources = cmp.config.sources({

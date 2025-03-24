@@ -1,9 +1,13 @@
 return {
   {
     "nvim-lualine/lualine.nvim",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
+    dependencies = {
+      "nvim-tree/nvim-web-devicons",
+      "linrongbin16/lsp-progress.nvim",
+    },
     config = function()
       local lualine = require("lualine")
+      local progress = require("lsp-progress").progress
 
       -- Only show filename in statusline mode, with git info and diagnostics
       local minimal_sections = {
@@ -34,6 +38,7 @@ return {
               newfile = "[New]",
             },
           },
+          { progress }, -- Add LSP progress
         },
         lualine_x = {
           {
@@ -75,6 +80,14 @@ return {
         tabline = {},
         winbar = {},
         extensions = { "oil", "fugitive", "lazy", "mason", "quickfix" },
+      })
+
+      -- Refresh lualine when LSP progress updates
+      vim.api.nvim_create_augroup("lualine_augroup", { clear = true })
+      vim.api.nvim_create_autocmd("User", {
+        group = "lualine_augroup",
+        pattern = "LspProgressStatusUpdated",
+        callback = require("lualine").refresh,
       })
     end,
   },
