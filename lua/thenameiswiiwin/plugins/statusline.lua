@@ -15,7 +15,7 @@ return {
         lualine_b = {
           {
             "branch",
-            icon = "",
+            icon = "",
           },
           {
             "diff",
@@ -28,6 +28,7 @@ return {
           },
         },
         lualine_c = {
+          "%=", -- forces everything after this to center
           {
             "filename",
             path = 1, -- Relative path
@@ -37,6 +38,7 @@ return {
               unnamed = "[No Name]",
               newfile = "[New]",
             },
+            "%=",  -- forces everything after this to center
           },
           { progress }, -- Add LSP progress
         },

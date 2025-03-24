@@ -71,7 +71,7 @@ return {
             return {
               -- Enhanced editor UI highlights
               CursorLineNr = { fg = mocha.peach, bold = true },
-              LineNr = { fg = mocha.surface1 },
+              LineNr = { fg = mocha.overlay2 },
               CursorLine = { bg = mocha.surface0 },
 
               -- Telescope customization

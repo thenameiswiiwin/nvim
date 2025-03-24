@@ -12,8 +12,7 @@ opt.cursorline = true
 opt.tabstop = 2 -- Default to 2 spaces for tabs
 opt.softtabstop = 2
 opt.shiftwidth = 2
-opt.expandtab = true -- Use spaces instead of tabs
-opt.smartindent = true
+opt.expandtab = true -- Use spaces instead of tabs opt.smartindent = true
 
 -- No line wrapping
 opt.wrap = false
@@ -79,4 +78,4 @@ vim.diagnostic.config({
 
 -- Line number and sign column colors
 vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#fab387", bold = true })
-vim.api.nvim_set_hl(0, "LineNr", { fg = "#7F849C" })
+vim.api.nvim_set_hl(0, "LineNr", { fg = "#9399b2" })

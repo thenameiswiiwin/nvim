@@ -9,7 +9,6 @@ return {
       "hrsh7th/cmp-cmdline",
       "hrsh7th/cmp-nvim-lua", -- For Neovim Lua API
       "hrsh7th/cmp-calc",  -- For calculations
-      "hrsh7th/cmp-emoji", -- For emoji support
 
       -- Snippets
       "L3MON4D3/LuaSnip",
@@ -150,7 +149,6 @@ return {
           { name = "path",     group_index = 3 }, -- File paths
           { name = "nvim_lua", group_index = 3 }, -- Neovim Lua API
           { name = "calc",     group_index = 3 }, -- Calculations
-          { name = "emoji",    group_index = 3 }, -- Emoji
         }, {
           { name = "buffer" },               -- Buffer text
         }),

@@ -150,11 +150,6 @@ return {
       -- Load extensions
       telescope.load_extension("fzf")
 
-      -- Keymaps for Telescope are in keymaps.lua
-      -- vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find files" })
-      -- vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Live grep" })
-      -- etc.
-
       -- Add Git-specific pickers
       vim.keymap.set("n", "<leader>gc", builtin.git_commits, { desc = "Git commits" })
       vim.keymap.set("n", "<leader>gb", builtin.git_branches, { desc = "Git branches" })

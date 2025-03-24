@@ -53,7 +53,6 @@ return {
           -- Linters
           "eslint_d", -- JavaScript linter
           "shellcheck", -- Shell linter
-          "selene",  -- Lua linter
           "markdownlint", -- Markdown linter
         },
         auto_update = true,
@@ -69,7 +68,6 @@ return {
         typescriptreact = { "eslint_d" },
         svelte = { "eslint_d" },
         vue = { "eslint_d" },
-        lua = { "selene" },
         markdown = { "markdownlint" },
         sh = { "shellcheck" },
       }
@@ -214,19 +212,35 @@ return {
       -- Setup LSP Progress
       require("lsp-progress").setup()
 
-      -- Register autocmd for LSP attach to enable inlay hints
       vim.api.nvim_create_autocmd("LspAttach", {
         callback = function(args)
           local client = vim.lsp.get_client_by_id(args.data.client_id)
           if client and client.supports_method("textDocument/inlayHint") then
-            vim.lsp.inlay_hint.enable(args.buf, true)
+            -- Using pcall to handle API differences across Neovim versions
+            pcall(function()
+              if vim.fn.has("nvim-0.10") == 1 then
+                -- For Neovim 0.10+
+                vim.lsp.inlay_hint.enable(true)
+              else
+                -- For older versions
+                vim.lsp.inlay_hint.enable(args.buf, true)
+              end
+            end)
           end
         end,
       })
 
-      -- Add keybinding to toggle inlay hints
       vim.keymap.set("n", "<leader>th", function()
-        vim.lsp.inlay_hint.enable(0, not vim.lsp.inlay_hint.is_enabled(0))
+        -- Using pcall to handle API differences across Neovim versions
+        pcall(function()
+          if vim.fn.has("nvim-0.10") == 1 then
+            -- For Neovim 0.10+
+            vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+          else
+            -- For older versions
+            vim.lsp.inlay_hint.enable(0, not vim.lsp.inlay_hint.is_enabled(0))
+          end
+        end)
       end, { desc = "Toggle inlay hints" })
     end,
   },
