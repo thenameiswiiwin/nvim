@@ -38,7 +38,7 @@ return {
           keymap = {
             accept = false,
             accept_word = false,
-            accept_line = "<Tab>",
+            accept_line = "<C-CR>",
             next = false,
             prev = false,
             dismiss = false,

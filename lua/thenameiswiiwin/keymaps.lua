@@ -32,14 +32,11 @@ vim.keymap.set("i", "<C-c>", "<Esc>")
 -- Disable ex mode
 vim.keymap.set("n", "Q", "<nop>")
 
--- Format file (now handled via LSP in init.lua)
--- vim.keymap.set("n", "<leader>f", vim.lsp.buf.format)
-
 -- Quickfix navigation
-vim.keymap.set("n", "<C-k>", "<cmd>cnext<CR>zz")
-vim.keymap.set("n", "<C-j>", "<cmd>cprev<CR>zz")
-vim.keymap.set("n", "<leader>k", "<cmd>lnext<CR>zz")
-vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz")
+vim.keymap.set("n", "<leader>qn", "<cmd>cnext<CR>zz", { desc = "Next quickfix item" })
+vim.keymap.set("n", "<leader>qp", "<cmd>cprev<CR>zz", { desc = "Previous quickfix item" })
+vim.keymap.set("n", "<leader>ln", "<cmd>lnext<CR>zz", { desc = "Next location item" })
+vim.keymap.set("n", "<leader>lp", "<cmd>lprev<CR>zz", { desc = "Previous quickfix item" })
 
 -- Quick search and replace for word under cursor
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
@@ -55,9 +52,6 @@ vim.keymap.set("n", "<leader>el", 'oif err != nil {<CR>}<Esc>Olog.Error("error",
 vim.keymap.set("n", "<leader><leader>", function()
   vim.cmd("so")
 end)
-
--- Oil file explorer
-vim.keymap.set("n", "<leader>pv", "<cmd>Oil<CR>", { desc = "Open parent directory in Oil" })
 
 -- Splits navigation
 vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Navigate to left split" })
@@ -80,6 +74,19 @@ vim.keymap.set("n", "<leader>fd", "<cmd>Telescope diagnostics<CR>", { desc = "Di
 vim.keymap.set("n", "<leader>fr", "<cmd>Telescope lsp_references<CR>", { desc = "References" })
 vim.keymap.set("n", "<leader>fi", "<cmd>Telescope lsp_implementations<CR>", { desc = "Implementations" })
 vim.keymap.set("n", "<leader>fs", "<cmd>Telescope lsp_document_symbols<CR>", { desc = "Document symbols" })
+
+-- LSP keybindings (these will be applied on LSP attach)
+vim.g.lsp_keymaps = {
+  { "n", "gd",         vim.lsp.buf.definition,     { desc = "Go to definition" } },
+  { "n", "K",          vim.lsp.buf.hover,          { desc = "Show hover information" } },
+  { "n", "<leader>vd", vim.diagnostic.open_float,  { desc = "Open diagnostic float" } },
+  { "n", "<leader>ca", vim.lsp.buf.code_action,    { desc = "Code action" } },
+  { "n", "<leader>rn", vim.lsp.buf.rename,         { desc = "Rename symbol" } },
+  { "n", "<leader>rf", vim.lsp.buf.references,     { desc = "Find references" } },
+  { "i", "<C-h>",      vim.lsp.buf.signature_help, { desc = "Signature help" } },
+  { "n", "[d",         vim.diagnostic.goto_prev,   { desc = "Previous diagnostic" } },
+  { "n", "]d",         vim.diagnostic.goto_next,   { desc = "Next diagnostic" } },
+}
 
 -- Quick save
 vim.keymap.set("n", "<C-s>", "<cmd>w<CR>", { desc = "Save file" })

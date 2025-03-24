@@ -46,16 +46,12 @@ autocmd("LspAttach", {
     local client = vim.lsp.get_client_by_id(event.data.client_id)
     local opts = { buffer = event.buf }
 
-    -- Key mappings available after LSP attaches
-    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-    vim.keymap.set("n", "<leader>vd", vim.diagnostic.open_float, opts)
-    vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
-    vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-    vim.keymap.set("n", "<leader>rf", vim.lsp.buf.references, opts)
-    vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, opts)
-    vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
-    vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
+    -- Apply predefined LSP keymaps
+    for _, mapping in ipairs(vim.g.lsp_keymaps) do
+      local mode, lhs, rhs, map_opts = unpack(mapping)
+      map_opts = vim.tbl_extend("force", map_opts or {}, opts)
+      vim.keymap.set(mode, lhs, rhs, map_opts)
+    end
 
     -- Auto format on save if supported
     if client and client.supports_method("textDocument/formatting") then

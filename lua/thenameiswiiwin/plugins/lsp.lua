@@ -40,12 +40,11 @@ return {
           "stylua", -- Lua
           "prettier", -- Web dev formatting
           "prettierd", -- Faster prettier daemon
-          -- "rustywind", -- TailwindCSS class sorter (removed as it might cause issues)
 
           -- Linters
           "eslint_d", -- JavaScript linter
           "shellcheck", -- Shell linter
-          -- "selene", -- Lua linter (removed due to system error)
+          "selene",  -- Lua linter
           "markdownlint", -- Markdown linter
         },
         auto_update = true,
@@ -61,7 +60,7 @@ return {
         typescriptreact = { "eslint_d" },
         svelte = { "eslint_d" },
         vue = { "eslint_d" },
-        -- lua = { "selene" }, -- Commented out due to system error
+        lua = { "selene" },
         markdown = { "markdownlint" },
         sh = { "shellcheck" },
       }

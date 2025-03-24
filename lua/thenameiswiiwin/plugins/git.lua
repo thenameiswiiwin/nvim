@@ -71,11 +71,11 @@ return {
     "tpope/vim-fugitive",
     config = function()
       -- Shortcuts for common fugitive commands
-      vim.keymap.set("n", "<leader>gs", vim.cmd.Git, { desc = "Git status" })
-      vim.keymap.set("n", "<leader>gc", ":Git commit<CR>", { desc = "Git commit" })
-      vim.keymap.set("n", "<leader>gp", ":Git push<CR>", { desc = "Git push" })
-      vim.keymap.set("n", "<leader>gl", ":Git pull --rebase<CR>", { desc = "Git pull (rebase)" })
-      vim.keymap.set("n", "<leader>gb", ":Git blame<CR>", { desc = "Git blame" })
+      vim.keymap.set("n", "<leader>gfs", vim.cmd.Git, { desc = "Fugitive: Git status" })
+      vim.keymap.set("n", "<leader>gfc", ":Git commit<CR>", { desc = "Fugitive: Git commit" })
+      vim.keymap.set("n", "<leader>gfp", ":Git push<CR>", { desc = "Fugitive: Git push" })
+      vim.keymap.set("n", "<leader>gfl", ":Git pull --rebase<CR>", { desc = "Fugitive: Git pull (rebase)" })
+      vim.keymap.set("n", "<leader>gfb", ":Git blame<CR>", { desc = "Fugitive: Git blame" })
 
       -- Set up autocmds for fugitive buffers
       local Fugitive = vim.api.nvim_create_augroup("Fugitive", {})
