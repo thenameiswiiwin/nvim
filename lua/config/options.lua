@@ -1,5 +1,8 @@
 local opt = vim.opt
 
+opt.encoding = "utf-8"
+opt.fileencoding = "utf-8"
+
 -- Use block cursor
 opt.guicursor = ""
 
@@ -31,7 +34,7 @@ opt.incsearch = true -- Show search matches as you type
 opt.termguicolors = true
 
 -- UI improvements
-opt.scrolloff = 8      -- Keep 8 lines visible above/below cursor
+opt.scrolloff = 8 -- Keep 8 lines visible above/below cursor
 opt.signcolumn = "yes" -- Always show sign column
 opt.isfname:append("@-@")
 
@@ -75,7 +78,3 @@ vim.diagnostic.config({
     source = "always",
   },
 })
-
--- Line number and sign column colors
-vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#fab387", bold = true })
-vim.api.nvim_set_hl(0, "LineNr", { fg = "#9399b2" })

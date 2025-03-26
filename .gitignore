@@ -1,79 +1,8 @@
-# Plugin manager and downloaded plugins
-lazy-lock.json
-/plugin/
-
-# Compiled Lua files
-luac.out
-*.src.rock
-*.so
-*.o
-*.dll
-
-# Neovim data directories
-.cache/
-/data/
-/site/
-/pack/
-
-# Lazy.nvim and other package manager data
-.lazy/
-
-# Swap, undo, and backup files
-[._]*.s[a-v][a-z]
-[._]*.sw[a-p]
-[._]s[a-rt-v][a-z]
-[._]ss[a-gi-z]
-[._]sw[a-p]
-*~
-tags
-*.un~
-*.bak
-.netrwhist
-undodir/
-.vim/undo/
-
-# LSP and Mason data
-.mason/
-/lsp/
-
-# Logs
-logs/
+tt.*
+.tests
+doc/tags
+debug
+.repro
+foo.*
 *.log
-debug/
-
-# Local configuration
-.luarc.json
-.stylua.toml
-local.vim
-local.lua
-after.vim
-after.lua
-
-# Session files
-Session.vim
-Sessionx.vim
-
-# OS specific files
-.DS_Store
-.directory
-Desktop.ini
-Thumbs.db
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-
-# Test-related
-.neotest*
-test_results/
-
-# Runtime generated files
-/spell/
-.clang-format
-.ccls-cache/
-.clangd/
-.vscode/
-.idea/
-.metals/
-.settings/
-.exrc
-.vale.ini
+data

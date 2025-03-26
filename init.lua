@@ -1,1 +1,1 @@
-require("thenameiswiiwin")
+require("config.lazy")
