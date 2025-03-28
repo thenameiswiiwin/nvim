@@ -16,7 +16,7 @@ return {
         "css-lsp",
         "vue-language-server",
         "lua-language-server",
-        "intelephense'
+        "intelephense",
       })
     end,
   },
@@ -85,8 +85,7 @@ return {
                 callSnippet = "Both",
               },
               misc = {
-                parameters = {
-                  -- "--log-level=trace",
+                parameters = { -- "--log-level=trace",
                 },
               },
               hint = {

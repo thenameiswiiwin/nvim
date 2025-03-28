@@ -1,6 +1,5 @@
 -- Latest development version
---
--- return {
---   { "folke/lazy.nvim", version = false },
---   { "LazyVim/LazyVim", version = false },
--- }
+return {
+  --   { "folke/lazy.nvim", version = false },
+  --   { "LazyVim/LazyVim", version = false },
+}
