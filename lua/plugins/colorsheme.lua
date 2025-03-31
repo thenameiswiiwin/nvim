@@ -3,7 +3,7 @@ return {
     "rose-pine/neovim",
     name = "rose-pine",
     opts = {
-      variant = "dawn", -- auto, main, moon, or dawn
+      variant = "auto", -- auto, main, moon, or dawn
       dark_variant = "main", -- main, moon, or dawn
     },
   },
