@@ -9,10 +9,11 @@ opt.relativenumber = true
 opt.cursorline = true
 
 -- Tab settings
-opt.tabstop = 2 -- Default to 2 spaces for tabs
+opt.tabstop = 2
 opt.softtabstop = 2
 opt.shiftwidth = 2
-opt.expandtab = true -- Use spaces instead of tabs opt.smartindent = true
+opt.expandtab = true
+opt.smartindent = true
 
 -- No line wrapping
 opt.wrap = false
@@ -20,7 +21,7 @@ opt.wrap = false
 -- Backup and undo
 opt.swapfile = false
 opt.backup = false
-opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
+opt.undodir = vim.fn.stdpath("data") .. "/undodir"
 opt.undofile = true
 
 -- Search settings
@@ -31,12 +32,14 @@ opt.incsearch = true -- Show search matches as you type
 opt.termguicolors = true
 
 -- UI improvements
-opt.scrolloff = 8      -- Keep 8 lines visible above/below cursor
+opt.scrolloff = 8 -- Keep 8 lines visible above/below cursor
 opt.signcolumn = "yes" -- Always show sign column
 opt.isfname:append("@-@")
 
 -- Faster update time for better UX
 opt.updatetime = 50
+opt.timeout = true
+opt.timeoutlen = 300
 
 -- Line length indicator
 opt.colorcolumn = "80"
@@ -54,11 +57,7 @@ if vim.fn.executable("rg") == 1 then
   opt.grepformat = "%f:%l:%c:%m"
 end
 
--- Set leader key (must happen early)
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
-
--- Hide command line when not in use (Neovim v0.8+)
+-- Hide command line when not in use
 opt.cmdheight = 1
 
 -- Configure diagnostics display
@@ -76,6 +75,20 @@ vim.diagnostic.config({
   },
 })
 
--- Line number and sign column colors
-vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#fab387", bold = true })
-vim.api.nvim_set_hl(0, "LineNr", { fg = "#9399b2" })
+-- Statuscolumn setup
+opt.statuscolumn = "%=%{v:relnum?v:relnum:v:lnum} %s"
+
+-- Fold settings for better performance
+opt.foldmethod = "expr"
+opt.foldexpr = "nvim_treesitter#foldexpr()"
+opt.foldenable = false
+opt.foldlevel = 99
+
+-- Global status line for a cleaner look
+opt.laststatus = 3
+
+-- Disable providers not needed (improves startup time)
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_node_provider = 0
+vim.g.loaded_perl_provider = 0

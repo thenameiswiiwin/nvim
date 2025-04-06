@@ -17,14 +17,14 @@ require("lazy").setup({
 
   -- Configuration
   defaults = {
-    lazy = false,  -- Load plugins on startup by default
+    lazy = true, -- Lazy load plugins by default
     version = false, -- Always use the latest version
   },
 
   -- Install options
   install = {
     -- Try to load colorscheme when installing
-    colorscheme = { "catppuccin" },
+    colorscheme = { "rose-pine" },
   },
 
   -- Performance settings
@@ -51,19 +51,9 @@ require("lazy").setup({
   -- UI customization
   ui = {
     border = "rounded",
-    icons = {
-      cmd = "󰘳 ",
-      config = " ",
-      event = " ",
-      ft = " ",
-      init = " ",
-      keys = " ",
-      plugin = "󰏓 ",
-      runtime = "󱑤 ",
-      source = " ",
-      start = "󰼛 ",
-      task = " ",
-      lazy = "󰂠 ",
+    size = {
+      width = 0.8,
+      height = 0.8,
     },
   },
 

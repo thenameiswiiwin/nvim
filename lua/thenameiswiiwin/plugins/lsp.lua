@@ -1,136 +1,45 @@
 return {
+  -- Nvim-lspconfig: Core LSP client configuration
   {
     "neovim/nvim-lspconfig",
+    event = { "BufReadPre", "BufNewFile" },
     dependencies = {
       -- LSP Management
       "williamboman/mason.nvim",
       "williamboman/mason-lspconfig.nvim",
-      "WhoIsSethDaniel/mason-tool-installer.nvim",
-
-      -- Useful status updates for LSP
-      { "j-hui/fidget.nvim", opts = {} },
 
       -- Additional lua configuration
       "folke/neodev.nvim",
 
-      -- For formatters and linters
-      "stevearc/conform.nvim",
-      "mfussenegger/nvim-lint",
-
-      -- LSP Progress indicator
-      "linrongbin16/lsp-progress.nvim",
-
-      -- TypeScript tools for enhanced experience
-      {
-        "pmizio/typescript-tools.nvim",
-        dependencies = { "nvim-lua/plenary.nvim" },
-      },
+      -- For schemas
+      "b0o/SchemaStore.nvim",
     },
     config = function()
       -- Setup neovim lua configuration
       require("neodev").setup()
 
-      -- Setup mason so it can manage external LSP, linters, and formatters
-      require("mason").setup({
-        ui = {
-          border = "rounded",
-          icons = {
-            package_installed = "✓",
-            package_pending = "➜",
-            package_uninstalled = "✗",
+      -- Function to get capabilities with specified features
+      local function make_capabilities(additional_capabilities)
+        local capabilities = vim.lsp.protocol.make_client_capabilities()
+        capabilities.textDocument.completion.completionItem.snippetSupport =
+          true
+        capabilities.textDocument.completion.completionItem.resolveSupport = {
+          properties = {
+            "documentation",
+            "detail",
+            "additionalTextEdits",
           },
-        },
-      })
-
-      -- Configure formatters and linters for Mason to manage
-      require("mason-tool-installer").setup({
-        ensure_installed = {
-          -- Formatter
-          "stylua", -- Lua
-          "prettier", -- Web dev formatting
-          "prettierd", -- Faster prettier daemon
-
-          -- Linters
-          "eslint_d", -- JavaScript linter
-          "shellcheck", -- Shell linter
-          "markdownlint", -- Markdown linter
-        },
-        auto_update = true,
-        run_on_start = true,
-      })
-
-      -- Register linters using nvim-lint
-      local lint = require("lint")
-      lint.linters_by_ft = {
-        javascript = { "eslint_d" },
-        typescript = { "eslint_d" },
-        javascriptreact = { "eslint_d" },
-        typescriptreact = { "eslint_d" },
-        svelte = { "eslint_d" },
-        vue = { "eslint_d" },
-        markdown = { "markdownlint" },
-        sh = { "shellcheck" },
-      }
-
-      -- Create autocommand to trigger linting
-      vim.api.nvim_create_autocmd({ "BufWritePost", "BufEnter" }, {
-        callback = function()
-          require("lint").try_lint()
-        end,
-      })
-
-      -- Setup formatter
-      require("conform").setup({
-        formatters_by_ft = {
-          lua = { "stylua" },
-          javascript = { "prettierd", "prettier" },
-          typescript = { "prettierd", "prettier" },
-          javascriptreact = { "prettierd", "prettier" },
-          typescriptreact = { "prettierd", "prettier" },
-          css = { "prettierd", "prettier" },
-          html = { "prettierd", "prettier" },
-          json = { "prettierd", "prettier" },
-          yaml = { "prettierd", "prettier" },
-          markdown = { "prettierd", "prettier" },
-          graphql = { "prettierd", "prettier" },
-          vue = { "prettierd", "prettier" },
-          svelte = { "prettierd", "prettier" },
-          sh = { "shfmt" },
-        },
-
-        -- Format on save configuration
-        format_on_save = function(bufnr)
-          -- Disable with a global or buffer-local variable
-          if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
-            return
-          end
-          return {
-            timeout_ms = 500,
-            lsp_fallback = true,
-            stop_after_first = true,
-          }
-        end,
-      })
-
-      -- Format commands
-      vim.api.nvim_create_user_command("Format", function()
-        require("conform").format({ async = true, lsp_fallback = true })
-      end, { desc = "Format document" })
-
-      vim.api.nvim_create_user_command("FormatToggle", function(args)
-        if args.bang then
-          -- FormatToggle! will disable formatting just for this buffer
-          vim.b.disable_autoformat = not vim.b.disable_autoformat
-          vim.notify(
-            string.format("Buffer autoformatting %s", vim.b.disable_autoformat and "disabled" or "enabled")
-          )
-        else
-          vim.g.disable_autoformat = not vim.g.disable_autoformat
-          vim.notify(
-            string.format("Global autoformatting %s", vim.g.disable_autoformat and "disabled" or "enabled")
-          )
+        }
+        capabilities.textDocument.foldingRange = {
+          dynamicRegistration = false,
+          lineFoldingOnly = true,
+        }
+        if additional_capabilities then
+          capabilities =
+            vim.tbl_deep_extend("force", capabilities, additional_capabilities)
         end
-      end, { desc = "Toggle autoformatting", bang = true })
+        return capabilities
+      end
 
       -- Configure diagnostic display
       vim.diagnostic.config({
@@ -149,87 +58,306 @@ return {
         },
       })
 
-      -- LSP servers to set up with default options
+      -- Define diagnostic signs
+      for name, icon in pairs({
+        Error = "✖ ",
+        Warn = "⚠ ",
+        Hint = "󰌶 ",
+        Info = "ℹ ",
+      }) do
+        name = "DiagnosticSign" .. name
+        vim.fn.sign_define(name, { text = icon, texthl = name, numhl = name })
+      end
+
+      -- Create a function for LSP on_attach
+      local function on_attach(client, bufnr)
+        -- Enable inlay hints if supported
+        if client.supports_method("textDocument/inlayHint") then
+          -- Using pcall to handle API differences across Neovim versions
+          pcall(function()
+            if vim.fn.has("nvim-0.10") == 1 then
+              -- For Neovim 0.10+
+              vim.lsp.inlay_hint.enable(true)
+            else
+              -- For older versions
+              vim.lsp.inlay_hint.enable(bufnr, true)
+            end
+          end)
+        end
+
+        -- Enable document formatting if supported
+        if client.supports_method("textDocument/formatting") then
+          vim.api.nvim_buf_create_user_command(bufnr, "LspFormat", function()
+            vim.lsp.buf.format({ async = true })
+          end, { desc = "Format using LSP" })
+        end
+
+        -- Enable and configure navbuddy if available
+        pcall(function()
+          local navbuddy = require("nvim-navbuddy")
+          navbuddy.attach(client, bufnr)
+        end)
+      end
+
+      -- LSP servers to configure
       local servers = {
-        -- Web Development
-        ts_ls = {},             -- TypeScript/JavaScript
-        html = {},              -- HTML
-        cssls = {},             -- CSS
-        jsonls = {},            -- JSON
-        tailwindcss = {},       -- TailwindCSS
-        svelte = {},            -- Svelte
-        eslint = {},            -- ESLint
-        volar = {},             -- Vue
-        emmet_language_server = {}, -- Emmet
-
-        -- PHP
-        intelephense = {}, -- PHP
-
-        -- Other Languages
+        -- Lua
         lua_ls = {
-          Lua = {
-            workspace = { checkThirdParty = false },
-            telemetry = { enable = false },
-            diagnostics = { globals = { "vim" } },
+          settings = {
+            Lua = {
+              workspace = { checkThirdParty = false },
+              telemetry = { enable = false },
+              diagnostics = { globals = { "vim" } },
+              completion = { callSnippet = "Replace" },
+            },
           },
         },
-        gopls = {},     -- Go
-        rust_analyzer = {}, -- Rust
-        bashls = {},    -- Bash
-      }
 
-      -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
+        -- Web development
+        vtsls = {
+          settings = {
+            complete_function_calls = true,
+            typescript = {
+              updateImportsOnFileMove = { enabled = "always" },
+              suggest = { completeFunctionCalls = true },
+              inlayHints = {
+                enumMemberValues = { enabled = true },
+                functionLikeReturnTypes = { enabled = true },
+                parameterNames = { enabled = "literals" },
+                parameterTypes = { enabled = true },
+                propertyDeclarationTypes = { enabled = true },
+                variableTypes = { enabled = false },
+              },
+            },
+          },
+        },
+        volar = {
+          init_options = {
+            vue = { hybridMode = true },
+          },
+        },
+        eslint = {},
+
+        -- Go
+        gopls = {
+          settings = {
+            gopls = {
+              gofumpt = true,
+              codelenses = {
+                gc_details = false,
+                generate = true,
+                regenerate_cgo = true,
+                run_govulncheck = true,
+                test = true,
+                tidy = true,
+                upgrade_dependency = true,
+                vendor = true,
+              },
+              hints = {
+                assignVariableTypes = true,
+                compositeLiteralFields = true,
+                compositeLiteralTypes = true,
+                constantValues = true,
+                functionTypeParameters = true,
+                parameterNames = true,
+                rangeVariableTypes = true,
+              },
+              analyses = {
+                nilness = true,
+                unusedparams = true,
+                unusedwrite = true,
+                useany = true,
+              },
+              usePlaceholders = true,
+              completeUnimported = true,
+              staticcheck = true,
+              directoryFilters = {
+                "-.git",
+                "-.vscode",
+                "-.idea",
+                "-.vscode-test",
+                "-node_modules",
+              },
+              semanticTokens = true,
+            },
+          },
+        },
+
+        -- PHP
+        intelephense = {
+          settings = {
+            intelephense = {
+              stubs = {
+                "apache",
+                "bcmath",
+                "bz2",
+                "calendar",
+                "com_dotnet",
+                "Core",
+                "ctype",
+                "curl",
+                "date",
+                "dba",
+                "dom",
+                "enchant",
+                "exif",
+                "FFI",
+                "fileinfo",
+                "filter",
+                "fpm",
+                "ftp",
+                "gd",
+                "gettext",
+                "gmp",
+                "hash",
+                "iconv",
+                "imap",
+                "intl",
+                "json",
+                "ldap",
+                "libxml",
+                "mbstring",
+                "meta",
+                "mysqli",
+                "oci8",
+                "odbc",
+                "openssl",
+                "pcntl",
+                "pcre",
+                "PDO",
+                "pdo_ibm",
+                "pdo_mysql",
+                "pdo_pgsql",
+                "pdo_sqlite",
+                "pgsql",
+                "Phar",
+                "posix",
+                "pspell",
+                "readline",
+                "Reflection",
+                "session",
+                "shmop",
+                "SimpleXML",
+                "snmp",
+                "soap",
+                "sockets",
+                "sodium",
+                "SPL",
+                "sqlite3",
+                "standard",
+                "superglobals",
+                "sysvmsg",
+                "sysvsem",
+                "sysvshm",
+                "tidy",
+                "tokenizer",
+                "xml",
+                "xmlreader",
+                "xmlrpc",
+                "xmlwriter",
+                "xsl",
+                "Zend OPcache",
+                "zip",
+                "zlib",
+                "wordpress",
+                "phpunit",
+              },
+              files = {
+                maxSize = 5000000,
+              },
+            },
+          },
+        },
+        phpactor = {},
+
+        -- Rust
+        rust_analyzer = {
+          settings = {
+            ["rust-analyzer"] = {
+              cargo = {
+                allFeatures = true,
+                loadOutDirsFromCheck = true,
+                buildScripts = { enable = true },
+              },
+              procMacro = { enable = true },
+              checkOnSave = true,
+            },
+          },
+        },
+
+        -- TailwindCSS
+        tailwindcss = {
+          filetypes = {
+            "html",
+            "css",
+            "scss",
+            "javascript",
+            "javascriptreact",
+            "typescript",
+            "typescriptreact",
+            "vue",
+            "svelte",
+          },
+          settings = {
+            tailwindCSS = {
+              experimental = {
+                classRegex = {
+                  "tw`([^`]*)",
+                  'tw="([^"]*)',
+                  'tw={"([^"}]*)',
+                  "tw\\.\\w+`([^`]*)",
+                  "tw\\(.*?\\)`([^`]*)",
+                  { 'className="([^"]*)"', '"([^"]*)"' },
+                  { 'class="([^"]*)"', '"([^"]*)"' },
+                  { 'className={"([^"}]*)"}', '"([^"]*)"' },
+                  { "className={`([^`]*)`}", "`([^`]*)`" },
+                },
+              },
+            },
+          },
+        },
+
+        -- Bash
+        bashls = {},
+
+        -- JSON with schema support
+        jsonls = {
+          settings = {
+            json = {
+              schemas = require("schemastore").json.schemas(),
+              validate = { enable = true },
+            },
+          },
+        },
+
+        -- HTML
+        html = {},
+
+        -- CSS
+        cssls = {
+          settings = {
+            css = { validate = true },
+            scss = { validate = true },
+            less = { validate = true },
+          },
+        },
+      }
 
       -- Setup mason-lspconfig
       require("mason-lspconfig").setup({
         ensure_installed = vim.tbl_keys(servers),
         handlers = {
           function(server_name)
-            -- Apply default configuration from the servers table
-            require("lspconfig")[server_name].setup(
-              vim.tbl_deep_extend("force", { capabilities = capabilities }, servers[server_name] or {})
-            )
+            local server = servers[server_name] or {}
+            -- Apply defaults
+            server.capabilities = make_capabilities(server.capabilities)
+            server.on_attach = on_attach
+            require("lspconfig")[server_name].setup(server)
           end,
         },
       })
 
-      -- Setup TypeScript tools for enhanced experience
-      require("typescript-tools").setup({
-        settings = {
-          tsserver_file_preferences = {
-            includeInlayParameterNameHints = "all",
-            includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-            includeInlayFunctionParameterTypeHints = true,
-            includeInlayVariableTypeHints = true,
-            includeInlayPropertyDeclarationTypeHints = true,
-            includeInlayFunctionLikeReturnTypeHints = true,
-          },
-        },
-      })
-
-      -- Setup LSP Progress
-      require("lsp-progress").setup()
-
-      vim.api.nvim_create_autocmd("LspAttach", {
-        callback = function(args)
-          local client = vim.lsp.get_client_by_id(args.data.client_id)
-          if client and client.supports_method("textDocument/inlayHint") then
-            -- Using pcall to handle API differences across Neovim versions
-            pcall(function()
-              if vim.fn.has("nvim-0.10") == 1 then
-                -- For Neovim 0.10+
-                vim.lsp.inlay_hint.enable(true)
-              else
-                -- For older versions
-                vim.lsp.inlay_hint.enable(args.buf, true)
-              end
-            end)
-          end
-        end,
-      })
-
+      -- LSP features keymaps
       vim.keymap.set("n", "<leader>th", function()
         -- Using pcall to handle API differences across Neovim versions
         pcall(function()
@@ -243,5 +371,14 @@ return {
         end)
       end, { desc = "Toggle inlay hints" })
     end,
+  },
+
+  -- Mason-lspconfig: Bridge mason.nvim with lspconfig
+  {
+    "williamboman/mason-lspconfig.nvim",
+    event = { "BufReadPre", "BufNewFile" },
+    opts = {
+      automatic_installation = true,
+    },
   },
 }

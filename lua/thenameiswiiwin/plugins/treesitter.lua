@@ -1,52 +1,64 @@
 return {
+  -- Nvim-treesitter: Tree-sitter integration
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
-    event = { "BufReadPost", "BufNewFile" },
+    event = { "BufReadPre", "BufNewFile" },
+    cmd = { "TSUpdateSync", "TSUpdate", "TSInstall" },
     dependencies = {
       -- Additional text objects for treesitter
       "nvim-treesitter/nvim-treesitter-textobjects",
-      -- Enhanced code navigation and refactoring
-      "nvim-treesitter/nvim-treesitter-refactor",
-      -- Playground for debugging treesitter queries
-      "nvim-treesitter/playground",
-      -- Improved folding based on treesitter
-      {
-        "kevinhwang91/nvim-ufo",
-        dependencies = "kevinhwang91/promise-async",
-      },
-      -- Rainbow delimiters for better bracket matching
-      "HiPhish/rainbow-delimiters.nvim",
+
+      -- Auto closing of HTML/JSX tags
+      "windwp/nvim-ts-autotag",
     },
     config = function()
       -- Configure treesitter
       require("nvim-treesitter.configs").setup({
         -- A list of parser names, or "all"
         ensure_installed = {
-          "bash",
-          "c",
-          "css",
-          "dockerfile",
-          "go",
-          "graphql",
-          "html",
+          -- Web development
           "javascript",
+          "typescript",
+          "tsx",
+          "html",
+          "css",
+          "scss",
           "json",
+          "json5",
+          "jsonc",
+          "vue",
+          "svelte",
+
+          -- Languages
           "lua",
-          "markdown",
-          "markdown_inline",
+          "go",
+          "gomod",
+          "gowork",
+          "gosum",
           "php",
           "python",
-          "regex",
           "rust",
-          "scss",
-          "svelte",
-          "tsx",
-          "typescript",
+          "bash",
+
+          -- Markup and config
+          "markdown",
+          "markdown_inline",
+          "yaml",
+          "toml",
+
+          -- Git related
+          "git_config",
+          "gitcommit",
+          "git_rebase",
+          "gitignore",
+          "gitattributes",
+
+          -- Other utilities
+          "regex",
           "vim",
           "vimdoc",
-          "vue",
-          "yaml",
+          "query",
         },
 
         -- Install parsers synchronously (only applied to `ensure_installed`)
@@ -150,59 +162,15 @@ return {
           swap = {
             enable = true,
             swap_next = {
-              ["<leader>ws"] = "@parameter.inner",
-              ["<leader>wf"] = "@function.outer",
-              ["<leader>wm"] = "@call.outer",
+              ["<leader>cs"] = "@parameter.inner",
+              ["<leader>cf"] = "@function.outer",
+              ["<leader>cm"] = "@call.outer",
             },
             swap_previous = {
-              ["<leader>wS"] = "@parameter.inner",
-              ["<leader>wF"] = "@function.outer",
-              ["<leader>wM"] = "@call.outer",
+              ["<leader>cS"] = "@parameter.inner",
+              ["<leader>cF"] = "@function.outer",
+              ["<leader>cM"] = "@call.outer",
             },
-          },
-        },
-
-        -- Enhanced code navigation and refactoring
-        refactor = {
-          highlight_definitions = {
-            enable = true,
-            clear_on_cursor_move = true,
-          },
-          smart_rename = {
-            enable = true,
-            keymaps = {
-              smart_rename = "<leader>tr",
-            },
-          },
-          navigation = {
-            enable = true,
-            keymaps = {
-              goto_definition = "gnd",
-              list_definitions = "gnD",
-              list_definitions_toc = "gO",
-              goto_next_usage = "<a-*>",
-              goto_previous_usage = "<a-#>",
-            },
-          },
-        },
-
-        -- Playground for debugging treesitter queries
-        playground = {
-          enable = true,
-          disable = {},
-          updatetime = 25,
-          persist_queries = false,
-          keybindings = {
-            toggle_query_editor = "o",
-            toggle_hl_groups = "i",
-            toggle_injected_languages = "t",
-            toggle_anonymous_nodes = "a",
-            toggle_language_display = "I",
-            focus_language = "f",
-            unfocus_language = "F",
-            update = "R",
-            goto_node = "<cr>",
-            show_help = "?",
           },
         },
       })
@@ -219,53 +187,23 @@ return {
 
       vim.treesitter.language.register("templ", "templ")
 
-      -- Configure rainbow delimiters
-      local rainbow_delimiters = require("rainbow-delimiters")
-      vim.g.rainbow_delimiters = {
-        strategy = {
-          [""] = rainbow_delimiters.strategy["global"],
-          vim = rainbow_delimiters.strategy["local"],
+      -- Setup auto-tag for JSX/HTML
+      require("nvim-ts-autotag").setup({
+        enable = true,
+        filetypes = {
+          "html",
+          "xml",
+          "javascript",
+          "javascriptreact",
+          "typescript",
+          "typescriptreact",
+          "tsx",
+          "jsx",
+          "vue",
+          "svelte",
+          "php",
         },
-        query = {
-          [""] = "rainbow-delimiters",
-          lua = "rainbow-blocks",
-        },
-        highlight = {
-          "RainbowDelimiterRed",
-          "RainbowDelimiterYellow",
-          "RainbowDelimiterBlue",
-          "RainbowDelimiterOrange",
-          "RainbowDelimiterGreen",
-          "RainbowDelimiterViolet",
-          "RainbowDelimiterCyan",
-        },
-      }
-
-      -- Configure improved folding with UFO
-      vim.o.foldcolumn = "1"
-      vim.o.foldlevel = 99
-      vim.o.foldlevelstart = 99
-      vim.o.foldenable = true
-
-      require("ufo").setup({
-        provider_selector = function()
-          return { "treesitter", "indent" }
-        end,
       })
-
-      -- Keybindings for folding
-      vim.keymap.set("n", "zR", require("ufo").openAllFolds)
-      vim.keymap.set("n", "zM", require("ufo").closeAllFolds)
-      vim.keymap.set("n", "zr", require("ufo").openFoldsExceptKinds)
-      vim.keymap.set("n", "K", function()
-        local winid = require("ufo").peekFoldedLinesUnderCursor()
-        if not winid then
-          vim.lsp.buf.hover()
-        end
-      end)
-
-      -- Keymap for Treesitter playground
-      vim.keymap.set("n", "<leader>ts", "<cmd>TSPlaygroundToggle<CR>", { desc = "Toggle TS Playground" })
     end,
   },
 }
