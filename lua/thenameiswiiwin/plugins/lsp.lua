@@ -91,12 +91,6 @@ return {
             vim.lsp.buf.format({ async = true })
           end, { desc = "Format using LSP" })
         end
-
-        -- Enable and configure navbuddy if available
-        pcall(function()
-          local navbuddy = require("nvim-navbuddy")
-          navbuddy.attach(client, bufnr)
-        end)
       end
 
       -- LSP servers to configure
@@ -130,16 +124,26 @@ return {
               },
             },
           },
+          filetypes = {
+            "javascript",
+            "javascriptreact",
+            "javascript.jsx",
+            "typescript",
+            "typescriptreact",
+            "typescript.tsx",
+          },
         },
         volar = {
           init_options = {
             vue = { hybridMode = true },
           },
+          filetypes = { "vue", "typescript", "javascript" },
         },
         eslint = {},
 
         -- Go
         gopls = {
+          cmd = { "gopls" }, -- Explicitly set the command
           settings = {
             gopls = {
               gofumpt = true,

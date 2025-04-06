@@ -1,4 +1,3 @@
--- Helper function for terminal window navigation
 local function term_nav(direction)
   return function()
     if vim.fn.winnr("$") > 1 then
@@ -14,25 +13,60 @@ vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
 
 -- Cursor position after joining lines
-vim.keymap.set("n", "J", "mzJ`z", { desc = "Join lines and keep cursor position" })
+vim.keymap.set(
+  "n",
+  "J",
+  "mzJ`z",
+  { desc = "Join lines and keep cursor position" }
+)
 
 -- Keep cursor centered when jumping
-vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = "Half-page down with centered cursor" })
-vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = "Half-page up with centered cursor" })
+vim.keymap.set(
+  "n",
+  "<C-d>",
+  "<C-d>zz",
+  { desc = "Half-page down with centered cursor" }
+)
+vim.keymap.set(
+  "n",
+  "<C-u>",
+  "<C-u>zz",
+  { desc = "Half-page up with centered cursor" }
+)
 
 -- Keep search results centered
 vim.keymap.set("n", "n", "nzzzv", { desc = "Next search result and center" })
-vim.keymap.set("n", "N", "Nzzzv", { desc = "Previous search result and center" })
+vim.keymap.set(
+  "n",
+  "N",
+  "Nzzzv",
+  { desc = "Previous search result and center" }
+)
 
 -- Paste without losing register content
 vim.keymap.set("x", "<leader>p", [["_dP]], { desc = "Paste without yanking" })
 
 -- Yank to system clipboard
-vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]], { desc = "Yank to system clipboard" })
-vim.keymap.set("n", "<leader>Y", [["+Y]], { desc = "Yank line to system clipboard" })
+vim.keymap.set(
+  { "n", "v" },
+  "<leader>y",
+  [["+y]],
+  { desc = "Yank to system clipboard" }
+)
+vim.keymap.set(
+  "n",
+  "<leader>Y",
+  [["+Y]],
+  { desc = "Yank line to system clipboard" }
+)
 
 -- Delete without yanking
-vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]], { desc = "Delete without yanking" })
+vim.keymap.set(
+  { "n", "v" },
+  "<leader>d",
+  [["_d]],
+  { desc = "Delete without yanking" }
+)
 
 -- Escape from insert mode
 vim.keymap.set("i", "<C-c>", "<Esc>", { desc = "Exit insert mode" })
@@ -41,11 +75,36 @@ vim.keymap.set("i", "<C-c>", "<Esc>", { desc = "Exit insert mode" })
 vim.keymap.set("n", "Q", "<nop>", { desc = "Disable Ex mode" })
 
 -- Quickfix navigation
-vim.keymap.set("n", "<leader>xn", "<cmd>cnext<CR>zz", { desc = "Next quickfix item" })
-vim.keymap.set("n", "<leader>xp", "<cmd>cprev<CR>zz", { desc = "Previous quickfix item" })
-vim.keymap.set("n", "<leader>xq", "<cmd>copen<CR>", { desc = "Open quickfix list" })
-vim.keymap.set("n", "<leader>xl", "<cmd>lnext<CR>zz", { desc = "Next location item" })
-vim.keymap.set("n", "<leader>xL", "<cmd>lprev<CR>zz", { desc = "Previous location item" })
+vim.keymap.set(
+  "n",
+  "<leader>xn",
+  "<cmd>cnext<CR>zz",
+  { desc = "Next quickfix item" }
+)
+vim.keymap.set(
+  "n",
+  "<leader>xp",
+  "<cmd>cprev<CR>zz",
+  { desc = "Previous quickfix item" }
+)
+vim.keymap.set(
+  "n",
+  "<leader>xq",
+  "<cmd>copen<CR>",
+  { desc = "Open quickfix list" }
+)
+vim.keymap.set(
+  "n",
+  "<leader>xl",
+  "<cmd>lnext<CR>zz",
+  { desc = "Next location item" }
+)
+vim.keymap.set(
+  "n",
+  "<leader>xL",
+  "<cmd>lprev<CR>zz",
+  { desc = "Previous location item" }
+)
 
 -- Quick search and replace for word under cursor
 vim.keymap.set(
@@ -56,10 +115,20 @@ vim.keymap.set(
 )
 
 -- Make script executable
-vim.keymap.set("n", "<leader>cx", "<cmd>!chmod +x %<CR>", { silent = true, desc = "Make file executable" })
+vim.keymap.set(
+  "n",
+  "<leader>cx",
+  "<cmd>!chmod +x %<CR>",
+  { silent = true, desc = "Make file executable" }
+)
 
 -- Reload config
-vim.keymap.set("n", "<leader><leader>", "<cmd>source %<CR>", { desc = "Reload current file" })
+vim.keymap.set(
+  "n",
+  "<leader><leader>",
+  "<cmd>source %<CR>",
+  { desc = "Reload current file" }
+)
 
 -- Splits navigation
 vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Navigate to left split" })
@@ -68,15 +137,50 @@ vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Navigate to split below" })
 vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Navigate to split above" })
 
 -- Terminal window navigation
-vim.keymap.set("t", "<C-h>", term_nav("h"), { expr = true, desc = "Go to Left Window" })
-vim.keymap.set("t", "<C-j>", term_nav("j"), { expr = true, desc = "Go to Lower Window" })
-vim.keymap.set("t", "<C-k>", term_nav("k"), { expr = true, desc = "Go to Upper Window" })
-vim.keymap.set("t", "<C-l>", term_nav("l"), { expr = true, desc = "Go to Right Window" })
+vim.keymap.set(
+  "t",
+  "<C-h>",
+  term_nav("h"),
+  { expr = true, desc = "Go to Left Window" }
+)
+vim.keymap.set(
+  "t",
+  "<C-j>",
+  term_nav("j"),
+  { expr = true, desc = "Go to Lower Window" }
+)
+vim.keymap.set(
+  "t",
+  "<C-k>",
+  term_nav("k"),
+  { expr = true, desc = "Go to Upper Window" }
+)
+vim.keymap.set(
+  "t",
+  "<C-l>",
+  term_nav("l"),
+  { expr = true, desc = "Go to Right Window" }
+)
 
 -- Diagnostic navigation
-vim.keymap.set("n", "<leader>xd", vim.diagnostic.open_float, { desc = "Open diagnostic float" })
-vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
-vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+vim.keymap.set(
+  "n",
+  "<leader>xd",
+  vim.diagnostic.open_float,
+  { desc = "Open diagnostic float" }
+)
+vim.keymap.set(
+  "n",
+  "[d",
+  vim.diagnostic.goto_prev,
+  { desc = "Previous diagnostic" }
+)
+vim.keymap.set(
+  "n",
+  "]d",
+  vim.diagnostic.goto_next,
+  { desc = "Next diagnostic" }
+)
 
 -- LSP keybindings (these will be applied on LSP attach)
 vim.g.lsp_keymaps = {
@@ -142,12 +246,60 @@ vim.g.lsp_keymaps = {
 vim.keymap.set("n", "<C-s>", "<cmd>w<CR>", { desc = "Save file" })
 
 -- File explorer
-vim.keymap.set("n", "<leader>e", "<cmd>Oil<CR>", { desc = "Open file explorer" })
+vim.keymap.set(
+  "n",
+  "<leader>e",
+  "<cmd>Oil<CR>",
+  { desc = "Open file explorer" }
+)
 
 -- FZF-lua keymaps
-vim.keymap.set("n", "<leader>ff", "<cmd>FzfLua files<CR>", { desc = "Find files" })
-vim.keymap.set("n", "<leader>fg", "<cmd>FzfLua live_grep<CR>", { desc = "Live grep" })
-vim.keymap.set("n", "<leader>fb", "<cmd>FzfLua buffers<CR>", { desc = "Buffers" })
-vim.keymap.set("n", "<leader>fh", "<cmd>FzfLua help_tags<CR>", { desc = "Help tags" })
-vim.keymap.set("n", "<leader>fd", "<cmd>FzfLua diagnostics_workspace<CR>", { desc = "Diagnostics" })
-vim.keymap.set("n", "<leader>fs", "<cmd>FzfLua lsp_document_symbols<CR>", { desc = "Document symbols" })
+vim.keymap.set(
+  "n",
+  "<leader>ff",
+  "<cmd>FzfLua files<CR>",
+  { desc = "Find files" }
+)
+vim.keymap.set(
+  "n",
+  "<leader>fg",
+  "<cmd>FzfLua live_grep<CR>",
+  { desc = "Live grep" }
+)
+vim.keymap.set(
+  "n",
+  "<leader>fb",
+  "<cmd>FzfLua buffers<CR>",
+  { desc = "Buffers" }
+)
+vim.keymap.set(
+  "n",
+  "<leader>fh",
+  "<cmd>FzfLua help_tags<CR>",
+  { desc = "Help tags" }
+)
+vim.keymap.set(
+  "n",
+  "<leader>fd",
+  "<cmd>FzfLua diagnostics_workspace<CR>",
+  { desc = "Diagnostics" }
+)
+vim.keymap.set(
+  "n",
+  "<leader>fs",
+  "<cmd>FzfLua lsp_document_symbols<CR>",
+  { desc = "Document symbols" }
+)
+
+-- Add Zen Mode keymaps
+vim.keymap.set("n", "<leader>zz", function()
+  require("zen-mode").toggle({ window = { width = 90 } })
+end, { desc = "Zen Mode (with line numbers)" })
+vim.keymap.set("n", "<leader>zZ", function()
+  require("zen-mode").toggle({
+    window = {
+      width = 80,
+      options = { number = false, relativenumber = false },
+    },
+  })
+end, { desc = "Zen Mode (full)" })

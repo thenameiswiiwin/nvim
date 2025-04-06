@@ -27,8 +27,8 @@ return {
           debounce = 75,
           keymap = {
             accept = "<C-y>",
-            accept_word = "<C-w>",
-            accept_line = "<C-l>",
+            accept_word = "<M-k>",
+            accept_line = "<M-l>",
             next = "<C-n>",
             prev = "<C-p>",
             dismiss = "<C-e>",
@@ -69,7 +69,7 @@ return {
     "zbirenbaum/copilot-cmp",
     dependencies = {
       "zbirenbaum/copilot.lua",
-      "Saghen/blink.cmp", -- Corrected URL
+      "Saghen/blink.cmp",
     },
     config = function()
       require("copilot_cmp").setup({
@@ -86,9 +86,9 @@ return {
 
   -- Blink-cmp-copilot: Integration for blink.cmp
   {
-    "giuxtaposition/blink-cmp-copilot", -- Corrected URL
+    "giuxtaposition/blink-cmp-copilot",
     dependencies = {
-      "Saghen/blink.cmp", -- Corrected URL
+      "Saghen/blink.cmp",
       "zbirenbaum/copilot-cmp",
     },
     config = function()

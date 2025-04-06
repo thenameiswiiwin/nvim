@@ -137,7 +137,10 @@ return {
       dap.adapters.node2 = {
         type = "executable",
         command = "node",
-        args = { vim.fn.stdpath("data") .. "/mason/packages/node-debug2-adapter/out/src/nodeDebug.js" },
+        args = {
+          vim.fn.stdpath("data")
+            .. "/mason/packages/node-debug2-adapter/out/src/nodeDebug.js",
+        },
       }
 
       -- Configure language-specific debug configurations
@@ -164,7 +167,7 @@ return {
 
       dap.configurations.typescript = dap.configurations.javascript
 
-      -- Create UI
+      -- Create UI with performance improvements
       dapui.setup({
         icons = { expanded = "▾", collapsed = "▸", current_frame = "▸" },
         mappings = {
@@ -178,17 +181,17 @@ return {
         layouts = {
           {
             elements = {
-              { id = "scopes",      size = 0.25 },
+              { id = "scopes", size = 0.25 },
               { id = "breakpoints", size = 0.25 },
-              { id = "stacks",      size = 0.25 },
-              { id = "watches",     size = 0.25 },
+              { id = "stacks", size = 0.25 },
+              { id = "watches", size = 0.25 },
             },
             size = 40,
             position = "left",
           },
           {
             elements = {
-              { id = "repl",    size = 0.5 },
+              { id = "repl", size = 0.5 },
               { id = "console", size = 0.5 },
             },
             size = 10,
@@ -203,6 +206,10 @@ return {
             close = { "q", "<Esc>" },
           },
         },
+        render = {
+          max_value_lines = 100, -- Maximum number of lines for a value
+          max_type_length = 100, -- Maximum length of variable types
+        },
       })
 
       -- Virtual text integration
@@ -215,6 +222,10 @@ return {
         commented = false,
         virt_text_pos = "eol",
         all_frames = false,
+        only_first_definition = true, -- Show virtual text only for the first definition
+        display_callback = function(variable, _buf, _stackframe, _node)
+          return variable.name .. " = " .. variable.value
+        end,
       })
 
       -- Set up Mason DAP integration to automatically install adapters
@@ -222,8 +233,8 @@ return {
         automatic_installation = true,
         ensure_installed = {
           "js-debug-adapter", -- For JavaScript/TypeScript
-          "codelldb",     -- For Rust/C++
-          "delve",        -- For Go
+          "codelldb", -- For Rust/C++
+          "delve", -- For Go
           "php-debug-adapter", -- For PHP
         },
         handlers = {},
@@ -243,19 +254,26 @@ return {
       end
 
       -- Set up debug signs
-      vim.fn.sign_define(
-        "DapBreakpoint",
-        { text = "●", texthl = "DiagnosticSignError", linehl = "", numhl = "" }
-      )
+      vim.fn.sign_define("DapBreakpoint", {
+        text = "●",
+        texthl = "DiagnosticSignError",
+        linehl = "",
+        numhl = "",
+      })
       vim.fn.sign_define(
         "DapBreakpointCondition",
         { text = "◆", texthl = "DiagnosticSignWarn", linehl = "", numhl = "" }
       )
-      vim.fn.sign_define("DapLogPoint", { text = "◆", texthl = "DiagnosticSignInfo", linehl = "", numhl = "" })
       vim.fn.sign_define(
-        "DapStopped",
-        { text = "→", texthl = "DiagnosticSignWarn", linehl = "DapStoppedLine", numhl = "" }
+        "DapLogPoint",
+        { text = "◆", texthl = "DiagnosticSignInfo", linehl = "", numhl = "" }
       )
+      vim.fn.sign_define("DapStopped", {
+        text = "→",
+        texthl = "DiagnosticSignWarn",
+        linehl = "DapStoppedLine",
+        numhl = "",
+      })
       vim.fn.sign_define(
         "DapBreakpointRejected",
         { text = "●", texthl = "DiagnosticSignHint", linehl = "", numhl = "" }

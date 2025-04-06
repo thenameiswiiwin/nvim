@@ -11,6 +11,16 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- Performance optimization: Set this before loading plugins
+vim.g.loaded_gzip = 0
+vim.g.loaded_matchit = 0
+vim.g.loaded_netrwPlugin = 0
+vim.g.loaded_tarPlugin = 0
+vim.g.loaded_zipPlugin = 0
+vim.g.loaded_man = 0
+vim.g.loaded_2html_plugin = 0
+vim.g.loaded_remote_plugins = 0
+
 require("lazy").setup({
   -- Import all plugins from modules
   spec = { { import = "thenameiswiiwin.plugins" } },
@@ -44,6 +54,8 @@ require("lazy").setup({
         "tohtml",
         "tutor",
         "zipPlugin",
+        "spellfile",
+        "editorconfig",
       },
     },
   },
@@ -60,5 +72,12 @@ require("lazy").setup({
   -- Change detection options
   change_detection = {
     notify = false,
+  },
+
+  -- Profile plugin loading (for debugging if needed)
+  profiling = {
+    -- Set to true to enable profiling
+    enabled = false,
+    threshold = 1, -- Minimum time in ms to include in profiling report
   },
 })

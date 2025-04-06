@@ -37,6 +37,24 @@ return {
                 enable = true,
               },
               validate = { enable = true },
+              schemas = {
+                {
+                  fileMatch = { "package.json" },
+                  url = "https://json.schemastore.org/package.json",
+                },
+                {
+                  fileMatch = { "tsconfig.json", "tsconfig.*.json" },
+                  url = "https://json.schemastore.org/tsconfig.json",
+                },
+                {
+                  fileMatch = { ".prettierrc", ".prettierrc.json" },
+                  url = "https://json.schemastore.org/prettierrc.json",
+                },
+                {
+                  fileMatch = { ".eslintrc", ".eslintrc.json" },
+                  url = "https://json.schemastore.org/eslintrc.json",
+                },
+              },
             },
           },
         },

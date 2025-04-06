@@ -141,7 +141,7 @@ return {
 
   -- Blink.cmp: Completion engine
   {
-    "Saghen/blink.cmp", -- Corrected URL
+    "Saghen/blink.cmp",
     event = { "InsertEnter", "CmdlineEnter" },
     dependencies = {
       "L3MON4D3/LuaSnip",
@@ -149,9 +149,9 @@ return {
       "onsails/lspkind.nvim",
     },
     config = function()
-      local cmp = require("blink.cmp")
       local luasnip = require("luasnip")
       local lspkind = require("lspkind")
+      local blink_cmp = require("blink.cmp")
 
       -- Load snippets
       require("luasnip.loaders.from_vscode").lazy_load()
@@ -168,7 +168,7 @@ return {
             == nil
       end
 
-      cmp.setup({
+      blink_cmp.setup({
         snippet = {
           expand = function(args)
             luasnip.lsp_expand(args.body)
@@ -184,54 +184,54 @@ return {
             winhighlight = "Normal:CmpDocNormal",
           },
         },
-        mapping = cmp.mapping.preset.insert({
-          -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-          ["<C-y>"] = cmp.mapping.confirm({ select = true }),
+        mapping = {
+          -- Accept currently selected item
+          ["<C-y>"] = blink_cmp.confirm({ select = true }),
 
           -- Super Tab functionality
-          ["<Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_next_item()
+          ["<Tab>"] = function(fallback)
+            if blink_cmp.visible() then
+              blink_cmp.select_next_item()
             elseif luasnip.expand_or_jumpable() then
               luasnip.expand_or_jump()
             elseif has_words_before() then
-              cmp.complete()
+              blink_cmp.complete()
             else
               fallback()
             end
-          end, { "i", "s" }),
+          end,
 
-          ["<S-Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_prev_item()
+          ["<S-Tab>"] = function(fallback)
+            if blink_cmp.visible() then
+              blink_cmp.select_prev_item()
             elseif luasnip.jumpable(-1) then
               luasnip.jump(-1)
             else
               fallback()
             end
-          end, { "i", "s" }),
+          end,
 
           -- Scroll documentation
-          ["<C-d>"] = cmp.mapping.scroll_docs(4),
-          ["<C-u>"] = cmp.mapping.scroll_docs(-4),
+          ["<C-d>"] = blink_cmp.scroll_docs(4),
+          ["<C-u>"] = blink_cmp.scroll_docs(-4),
 
           -- Toggle completion
-          ["<C-Space>"] = cmp.mapping.complete(),
+          ["<C-Space>"] = blink_cmp.complete(),
 
           -- Abort completion
-          ["<C-e>"] = cmp.mapping.abort(),
+          ["<C-e>"] = blink_cmp.close(),
 
           -- Previous/next item
-          ["<C-p>"] = cmp.mapping.select_prev_item(),
-          ["<C-n>"] = cmp.mapping.select_next_item(),
-        }),
-        sources = cmp.config.sources({
+          ["<C-p>"] = blink_cmp.select_prev_item(),
+          ["<C-n>"] = blink_cmp.select_next_item(),
+        },
+        sources = {
           { name = "copilot" },
           { name = "nvim_lsp" },
           { name = "luasnip" },
           { name = "path" },
           { name = "buffer" },
-        }),
+        },
         formatting = {
           format = lspkind.cmp_format({
             mode = "symbol_text",
@@ -246,72 +246,41 @@ return {
               local colors = require("rose-pine.palette")
               vim_item.menu = vim_item.kind
               vim_item.kind_hl_group = "CmpItemKind" .. vim_item.kind
-              vim.api.nvim_set_hl(0, "CmpItemKindText", { fg = colors.text })
-              vim.api.nvim_set_hl(0, "CmpItemKindMethod", { fg = colors.iris })
-              vim.api.nvim_set_hl(
-                0,
-                "CmpItemKindFunction",
-                { fg = colors.iris }
-              )
-              vim.api.nvim_set_hl(
-                0,
-                "CmpItemKindConstructor",
-                { fg = colors.pine }
-              )
-              vim.api.nvim_set_hl(0, "CmpItemKindField", { fg = colors.foam })
-              vim.api.nvim_set_hl(
-                0,
-                "CmpItemKindVariable",
-                { fg = colors.text }
-              )
-              vim.api.nvim_set_hl(0, "CmpItemKindClass", { fg = colors.gold })
-              vim.api.nvim_set_hl(
-                0,
-                "CmpItemKindInterface",
-                { fg = colors.gold }
-              )
-              vim.api.nvim_set_hl(0, "CmpItemKindModule", { fg = colors.gold })
-              vim.api.nvim_set_hl(
-                0,
-                "CmpItemKindProperty",
-                { fg = colors.foam }
-              )
-              vim.api.nvim_set_hl(0, "CmpItemKindUnit", { fg = colors.gold })
-              vim.api.nvim_set_hl(0, "CmpItemKindValue", { fg = colors.pine })
-              vim.api.nvim_set_hl(0, "CmpItemKindEnum", { fg = colors.gold })
-              vim.api.nvim_set_hl(0, "CmpItemKindKeyword", { fg = colors.rose })
-              vim.api.nvim_set_hl(0, "CmpItemKindSnippet", { fg = colors.iris })
-              vim.api.nvim_set_hl(0, "CmpItemKindColor", { fg = colors.rose })
-              vim.api.nvim_set_hl(0, "CmpItemKindFile", { fg = colors.text })
-              vim.api.nvim_set_hl(
-                0,
-                "CmpItemKindReference",
-                { fg = colors.text }
-              )
-              vim.api.nvim_set_hl(0, "CmpItemKindFolder", { fg = colors.text })
-              vim.api.nvim_set_hl(
-                0,
-                "CmpItemKindEnumMember",
-                { fg = colors.pine }
-              )
-              vim.api.nvim_set_hl(
-                0,
-                "CmpItemKindConstant",
-                { fg = colors.pine }
-              )
-              vim.api.nvim_set_hl(0, "CmpItemKindStruct", { fg = colors.gold })
-              vim.api.nvim_set_hl(0, "CmpItemKindEvent", { fg = colors.rose })
-              vim.api.nvim_set_hl(
-                0,
-                "CmpItemKindOperator",
-                { fg = colors.rose }
-              )
-              vim.api.nvim_set_hl(
-                0,
-                "CmpItemKindTypeParameter",
-                { fg = colors.foam }
-              )
-              vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = colors.gold })
+
+              -- Set up highlighting for completion items
+              local hl_groups = {
+                Text = colors.text,
+                Method = colors.iris,
+                Function = colors.iris,
+                Constructor = colors.pine,
+                Field = colors.foam,
+                Variable = colors.text,
+                Class = colors.gold,
+                Interface = colors.gold,
+                Module = colors.gold,
+                Property = colors.foam,
+                Unit = colors.gold,
+                Value = colors.pine,
+                Enum = colors.gold,
+                Keyword = colors.rose,
+                Snippet = colors.iris,
+                Color = colors.rose,
+                File = colors.text,
+                Reference = colors.text,
+                Folder = colors.text,
+                EnumMember = colors.pine,
+                Constant = colors.pine,
+                Struct = colors.gold,
+                Event = colors.rose,
+                Operator = colors.rose,
+                TypeParameter = colors.foam,
+                Copilot = colors.gold,
+              }
+
+              for kind, color in pairs(hl_groups) do
+                vim.api.nvim_set_hl(0, "CmpItemKind" .. kind, { fg = color })
+              end
+
               return vim_item
             end,
           }),
@@ -321,22 +290,19 @@ return {
         },
       })
 
-      -- Use buffer source for `/` and `?`
-      cmp.setup.cmdline({ "/", "?" }, {
-        mapping = cmp.mapping.preset.cmdline(),
+      -- Set up cmdline completion for / and ?
+      blink_cmp.setup_cmdline({ "/", "?" }, {
         sources = {
           { name = "buffer" },
         },
       })
 
-      -- Use cmdline & path source for ':'
-      cmp.setup.cmdline(":", {
-        mapping = cmp.mapping.preset.cmdline(),
-        sources = cmp.config.sources({
+      -- Set up cmdline completion for :
+      blink_cmp.setup_cmdline(":", {
+        sources = {
           { name = "path" },
-        }, {
           { name = "cmdline" },
-        }),
+        },
       })
 
       -- Set up filetype-specific snippets

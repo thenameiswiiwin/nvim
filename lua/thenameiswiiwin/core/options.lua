@@ -87,6 +87,14 @@ opt.foldlevel = 99
 -- Global status line for a cleaner look
 opt.laststatus = 3
 
+-- Better performance settings
+opt.hidden = true -- Hide buffers when abandoned
+opt.history = 100 -- Remember only last 100 commands
+opt.synmaxcol = 240 -- Only highlight first 240 columns
+opt.ttyfast = true -- Faster terminal rendering
+opt.redrawtime = 1500 -- Time in milliseconds for abandoning redraw
+opt.ttimeoutlen = 10 -- Short key code timeout
+
 -- Disable providers not needed (improves startup time)
 vim.g.loaded_python3_provider = 0
 vim.g.loaded_ruby_provider = 0

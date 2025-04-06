@@ -1,3 +1,4 @@
+-- Path: lua/thenameiswiiwin/plugins/formatting.lua
 return {
   -- Conform.nvim: Formatting engine
   {
@@ -18,18 +19,18 @@ return {
         lua = { "stylua" },
 
         -- Web development
-        javascript = { "prettierd", "prettier" },
-        typescript = { "prettierd", "prettier" },
-        javascriptreact = { "prettierd", "prettier" },
-        typescriptreact = { "prettierd", "prettier" },
-        svelte = { "prettierd", "prettier" },
-        css = { "prettierd", "prettier" },
-        html = { "prettierd", "prettier" },
-        json = { "prettierd", "prettier" },
-        yaml = { "prettierd", "prettier" },
-        markdown = { "prettierd", "prettier" },
-        graphql = { "prettierd", "prettier" },
-        vue = { "prettierd", "prettier" },
+        javascript = { "prettierd" },
+        typescript = { "prettierd" },
+        javascriptreact = { "prettierd" },
+        typescriptreact = { "prettierd" },
+        svelte = { "prettierd" },
+        css = { "prettierd" },
+        html = { "prettierd" },
+        json = { "prettierd" },
+        yaml = { "prettierd" },
+        markdown = { "prettierd" },
+        graphql = { "prettierd" },
+        vue = { "prettierd" },
 
         -- Go
         go = { "gofumpt", "goimports" },
@@ -59,6 +60,11 @@ return {
           },
         },
       },
+
+      -- Performance optimization settings
+      format_after_save = false,
+      notify_on_error = true,
+      log_level = vim.log.levels.ERROR,
     },
     init = function()
       -- Create format toggle command
@@ -130,6 +136,7 @@ return {
         "rust-analyzer",
         "codelldb",
       },
+      max_concurrent_installers = 10, -- Speed up installation
     },
     config = function(_, opts)
       require("mason").setup(opts)

@@ -6,6 +6,7 @@ return {
     config = function()
       local lint = require("lint")
 
+      -- Configure linters by filetype
       lint.linters_by_ft = {
         javascript = { "eslint_d" },
         typescript = { "eslint_d" },
@@ -17,9 +18,10 @@ return {
         sh = { "shellcheck" },
         bash = { "shellcheck" },
         php = { "phpcs" },
+        rust = { "clippy" },
       }
 
-      -- Configure linter options
+      -- Configure linter options for better performance
       lint.linters.eslint_d.args = {
         "--format",
         "json",
@@ -39,16 +41,32 @@ return {
         stream = "both",
       }
 
-      -- Add rust linting
-      lint.linters_by_ft.rust = { "clippy" }
+      -- Set up throttled autocommand for linting
+      local lint_augroup =
+        vim.api.nvim_create_augroup("nvim-lint", { clear = true })
 
-      -- Set up autocommand for linting
-      vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "InsertLeave" }, {
-        group = vim.api.nvim_create_augroup("nvim-lint", { clear = true }),
-        callback = function()
+      -- Throttled lint function
+      local lint_timer = nil
+      local function lint_throttled()
+        if lint_timer then
+          vim.loop.timer_stop(lint_timer)
+        end
+
+        lint_timer = vim.defer_fn(function()
           lint.try_lint()
-        end,
-      })
+          lint_timer = nil
+        end, 300) -- 300ms throttle
+      end
+
+      vim.api.nvim_create_autocmd(
+        { "BufWritePost", "BufReadPost", "InsertLeave" },
+        {
+          group = lint_augroup,
+          callback = function()
+            lint_throttled()
+          end,
+        }
+      )
 
       -- Add keymap to manually trigger linting
       vim.keymap.set("n", "<leader>cl", function()

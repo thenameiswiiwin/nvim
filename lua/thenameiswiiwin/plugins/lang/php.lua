@@ -102,10 +102,35 @@ return {
               diagnostics = {
                 enable = true,
               },
+              completion = {
+                maxItems = 100,
+                fullyQualifyGlobalConstantsAndFunctions = false,
+                triggerParameterHints = true,
+              },
+              phpdoc = {
+                useFullyQualifiedNames = false,
+              },
+              telemetry = {
+                enable = false,
+              },
             },
           },
         },
-        phpactor = {},
+        phpactor = {
+          filetypes = { "php" },
+          -- Only use certain features from phpactor since intelephense is more performant
+          init_options = {
+            index = {
+              enabled = false,
+            },
+            completion = {
+              enabled = false,
+            },
+            diagnostics = {
+              enabled = false,
+            },
+          },
+        },
       },
     },
   },
@@ -120,5 +145,12 @@ return {
         { "phpcs", "php-cs-fixer", "phpstan" }
       )
     end,
+  },
+
+  -- PHP Testing support
+  {
+    "olimorris/neotest-phpunit",
+    event = { "BufRead *.php" },
+    dependencies = { "nvim-neotest/neotest" },
   },
 }

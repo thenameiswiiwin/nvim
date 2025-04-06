@@ -7,13 +7,7 @@ return {
       "nvim-treesitter/nvim-treesitter",
       "antoinemadec/FixCursorHold.nvim",
       "nvim-neotest/nvim-nio",
-      -- Test adapters
-      "fredrikaverpil/neotest-golang",
-      "nvim-neotest/neotest-jest",
-      "marilari88/neotest-vitest",
-      "thenbe/neotest-playwright",
-      "rouge8/neotest-rust",
-      "olimorris/neotest-phpunit",
+      -- Lazy load test adapters based on filetype
     },
     keys = {
       {
@@ -90,6 +84,81 @@ return {
     config = function()
       local neotest = require("neotest")
 
+      -- Load adapters only when needed based on filetype
+      local adapters = {}
+
+      -- Only load JavaScript adapters when needed
+      if vim.fn.glob("**/package.json") ~= "" then
+        if vim.fn.glob("**/vitest.config.*") ~= "" then
+          table.insert(adapters, require("neotest-vitest"))
+        end
+
+        if vim.fn.glob("**/jest.config.*") ~= "" then
+          table.insert(
+            adapters,
+            require("neotest-jest")({
+              jestCommand = "npm test --",
+              env = { CI = true },
+              cwd = function()
+                return vim.fn.getcwd()
+              end,
+            })
+          )
+        end
+      end
+
+      -- Only load Go adapter when needed
+      if vim.fn.executable("go") == 1 then
+        table.insert(
+          adapters,
+          require("neotest-golang")({
+            experimental = {
+              test_table = true,
+            },
+            args = { "-count=1", "-timeout=60s" },
+          })
+        )
+      end
+
+      -- Only load Rust adapter when needed
+      if vim.fn.glob("**/Cargo.toml") ~= "" then
+        table.insert(
+          adapters,
+          require("neotest-rust")({
+            args = { "--no-capture" },
+            dap_adapter = "lldb",
+          })
+        )
+      end
+
+      -- Only load PHP adapter when needed
+      if
+        vim.fn.glob("**/phpunit.xml") ~= ""
+        or vim.fn.glob("**/composer.json") ~= ""
+      then
+        table.insert(
+          adapters,
+          require("neotest-phpunit")({
+            phpunit_cmd = function()
+              return "./vendor/bin/phpunit"
+            end,
+          })
+        )
+      end
+
+      -- Only load Playwright adapter when needed
+      if vim.fn.glob("**/playwright.config.*") ~= "" then
+        table.insert(
+          adapters,
+          require("neotest-playwright").adapter({
+            options = {
+              persist_project_selection = true,
+              enable_dynamic_test_discovery = true,
+            },
+          })
+        )
+      end
+
       neotest.setup({
         discovery = {
           enabled = true,
@@ -104,49 +173,7 @@ return {
             vim.cmd("copen")
           end,
         },
-        adapters = {
-          -- JavaScript testing
-          require("neotest-jest")({
-            jestCommand = "npm test --",
-            jestConfigFile = "jest.config.js",
-            env = { CI = true },
-            cwd = function()
-              return vim.fn.getcwd()
-            end,
-          }),
-
-          -- Vitest for Vue projects
-          require("neotest-vitest"),
-
-          -- Playwright for e2e testing
-          require("neotest-playwright").adapter({
-            options = {
-              persist_project_selection = true,
-              enable_dynamic_test_discovery = true,
-            },
-          }),
-
-          -- Go testing
-          require("neotest-golang")({
-            experimental = {
-              test_table = true,
-            },
-            args = { "-count=1", "-timeout=60s" },
-          }),
-
-          -- Rust testing
-          require("neotest-rust")({
-            args = { "--no-capture" },
-            dap_adapter = "lldb",
-          }),
-
-          -- PHP Testing
-          require("neotest-phpunit")({
-            phpunit_cmd = function()
-              return "./vendor/bin/phpunit"
-            end,
-          }),
-        },
+        adapters = adapters,
         icons = {
           failed = "✖",
           passed = "✓",
@@ -178,6 +205,16 @@ return {
             width = 120,
             height = 40,
           },
+        },
+        consumers = {
+          -- Lazy load consumers for better performance
+          overseer = function(_)
+            return require("neotest.consumers.overseer")
+          end,
+        },
+        -- Performance optimizations
+        running = {
+          concurrent = true,
         },
       })
     end,

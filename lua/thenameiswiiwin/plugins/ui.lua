@@ -149,12 +149,11 @@ return {
       })
 
       -- Add component for LSP status
-      -- Update this function in the lualine opts (around line 156)
       ins_right({
         function()
           local msg = "No LSP"
           local buf_ft = vim.api.nvim_buf_get_option(0, "filetype")
-          local clients = vim.lsp.get_clients() -- Changed from get_active_clients
+          local clients = vim.lsp.get_clients()
           if next(clients) == nil then
             return msg
           end
@@ -189,7 +188,7 @@ return {
       ins_right({
         "fileformat",
         fmt = string.upper,
-        icons_enabled = false, -- I think icons are cool but Eviline doesn't have them. sigh
+        icons_enabled = false,
         color = { fg = colors.iris },
       })
 
@@ -400,11 +399,20 @@ return {
         },
       },
       routes = {
+        -- Hide written message
         {
           filter = {
             event = "msg_show",
             kind = "",
             find = "written",
+          },
+          opts = { skip = true },
+        },
+        -- Ignore LSP progress messages
+        {
+          filter = {
+            event = "lsp",
+            kind = "progress",
           },
           opts = { skip = true },
         },

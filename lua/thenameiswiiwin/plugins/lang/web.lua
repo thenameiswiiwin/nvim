@@ -64,6 +64,7 @@ return {
   -- TailwindCSS colorizer integration
   {
     "roobert/tailwindcss-colorizer-cmp.nvim",
+    event = { "BufRead *.{html,css,scss,js,jsx,ts,tsx,vue,svelte}" },
     config = function()
       require("tailwindcss-colorizer-cmp").setup({
         color_square_width = 2,

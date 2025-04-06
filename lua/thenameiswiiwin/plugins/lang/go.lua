@@ -136,4 +136,11 @@ return {
       )
     end,
   },
+
+  -- Testing support for Go
+  {
+    "fredrikaverpil/neotest-golang",
+    event = { "BufRead *.go" },
+    dependencies = { "nvim-neotest/neotest" },
+  },
 }

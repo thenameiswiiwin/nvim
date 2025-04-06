@@ -35,4 +35,11 @@ return {
       vim.list_extend(opts.ensure_installed, { "vue-language-server" })
     end,
   },
+
+  -- Testing support for Vue
+  {
+    "marilari88/neotest-vitest",
+    event = { "BufRead *.vue" },
+    dependencies = { "nvim-neotest/neotest" },
+  },
 }

@@ -5,7 +5,15 @@ return {
     event = "BufReadPre",
     opts = {
       dir = vim.fn.expand(vim.fn.stdpath("state") .. "/sessions/"),
-      options = { "buffers", "curdir", "tabpages", "winsize", "help", "globals", "skiprtp" },
+      options = {
+        "buffers",
+        "curdir",
+        "tabpages",
+        "winsize",
+        "help",
+        "globals",
+        "skiprtp",
+      },
       pre_save = function()
         -- Close certain types of windows before saving the session
         local tabpages = vim.api.nvim_list_tabpages()
@@ -19,9 +27,9 @@ return {
 
             -- Skip special buffers
             if
-                vim.tbl_contains({ "gitcommit", "help", "qf" }, filetype)
-                or vim.tbl_contains({ "prompt", "nofile", "terminal" }, buftype)
-                or vim.fn.isdirectory(bufname) == 1
+              vim.tbl_contains({ "gitcommit", "help", "qf" }, filetype)
+              or vim.tbl_contains({ "prompt", "nofile", "terminal" }, buftype)
+              or vim.fn.isdirectory(bufname) == 1
             then
               pcall(vim.api.nvim_win_close, win, true)
             end

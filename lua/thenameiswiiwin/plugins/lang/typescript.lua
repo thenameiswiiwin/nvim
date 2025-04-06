@@ -70,4 +70,11 @@ return {
       )
     end,
   },
+
+  -- Testing support for TypeScript/JavaScript
+  {
+    "nvim-neotest/neotest-jest",
+    event = { "BufRead *.{ts,tsx,js,jsx}" },
+    dependencies = { "nvim-neotest/neotest" },
+  },
 }
