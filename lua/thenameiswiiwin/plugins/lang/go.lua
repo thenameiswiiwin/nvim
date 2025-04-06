@@ -79,6 +79,60 @@ return {
     opts = {
       servers = {
         gopls = {
+          -- Try to use the user's GOPATH for installing gopls if Mason fails
+          cmd = function()
+            -- Try Mason's version first
+            local mason_registry = require("mason-registry")
+            local mason_path = mason_registry
+              .get_package("gopls")
+              :get_install_path() .. "/gopls"
+
+            -- Check if Mason's gopls exists
+            if vim.fn.executable(mason_path) == 1 then
+              return { mason_path }
+            end
+
+            -- Fallback to system gopls
+            if vim.fn.executable("gopls") == 1 then
+              return { "gopls" }
+            end
+
+            -- If Go is available, try to install gopls directly
+            if vim.fn.executable("go") == 1 then
+              vim.notify(
+                "Attempting to install gopls with 'go install'...",
+                vim.log.levels.INFO
+              )
+              vim.fn.system({
+                "go",
+                "install",
+                "golang.org/x/tools/gopls@latest",
+              })
+
+              -- Check for GOPATH/bin/gopls
+              local gopath = vim.fn.trim(vim.fn.system("go env GOPATH"))
+              local gobin = gopath .. "/bin/gopls"
+
+              if vim.fn.executable(gobin) == 1 then
+                vim.notify(
+                  "Successfully installed gopls to GOPATH",
+                  vim.log.levels.INFO
+                )
+                return { gobin }
+              end
+
+              -- Final fallback to system path in case GOPATH/bin is in PATH
+              if vim.fn.executable("gopls") == 1 then
+                return { "gopls" }
+              end
+            end
+
+            vim.notify(
+              "Could not find gopls. Go language server will not work properly.",
+              vim.log.levels.WARN
+            )
+            return { "gopls" } -- Return a command anyway, it will fail later but won't break startup
+          end,
           settings = {
             gopls = {
               gofumpt = true,

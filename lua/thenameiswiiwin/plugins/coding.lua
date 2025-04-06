@@ -186,7 +186,9 @@ return {
         },
         mapping = {
           -- Accept currently selected item
-          ["<C-y>"] = blink_cmp.confirm({ select = true }),
+          ["<C-y>"] = function()
+            require("blink.cmp").confirm({ select = true })
+          end,
 
           -- Super Tab functionality
           ["<Tab>"] = function(fallback)

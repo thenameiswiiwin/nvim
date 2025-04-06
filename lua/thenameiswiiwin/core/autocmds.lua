@@ -7,12 +7,21 @@ autocmd("TextYankPost", {
   group = yank_group,
   pattern = "*",
   callback = function()
-    -- Use vim.highlight directly with pcall to gracefully handle deprecation
+    -- Use pcall to handle potential errors
     pcall(function()
-      vim.highlight.on_yank({
-        higroup = "IncSearch",
-        timeout = 40,
-      })
+      -- Try the newer API first
+      if vim.highlight then
+        vim.highlight.on_yank({
+          higroup = "IncSearch",
+          timeout = 40,
+        })
+      else
+        -- Fallback to new API in Neovim 0.10+
+        vim.hl.on_yank({
+          higroup = "IncSearch",
+          timeout = 40,
+        })
+      end
     end)
   end,
 })
