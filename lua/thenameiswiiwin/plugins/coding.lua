@@ -142,6 +142,7 @@ return {
   -- Blink.cmp: Completion engine
   {
     "Saghen/blink.cmp",
+    version = "1.*", -- Use a release tag to download pre-built binaries
     event = { "InsertEnter", "CmdlineEnter" },
     dependencies = {
       "L3MON4D3/LuaSnip",
@@ -169,141 +170,31 @@ return {
       end
 
       blink_cmp.setup({
-        snippet = {
-          expand = function(args)
-            luasnip.lsp_expand(args.body)
-          end,
+        keymap = {
+          preset = "default",
         },
-        window = {
-          completion = {
-            border = "rounded",
-            winhighlight = "Normal:CmpNormal",
-          },
+
+        sources = {
+          default = { "lsp", "copilot", "snippets", "path", "buffer" },
+        },
+
+        completion = {
           documentation = {
-            border = "rounded",
-            winhighlight = "Normal:CmpDocNormal",
+            auto_show = true,
+            auto_show_delay_ms = 300,
           },
         },
-        mapping = {
-          -- Accept currently selected item
-          ["<C-y>"] = function()
-            require("blink.cmp").confirm({ select = true })
-          end,
 
-          -- Super Tab functionality
-          ["<Tab>"] = function(fallback)
-            if blink_cmp.visible() then
-              blink_cmp.select_next_item()
-            elseif luasnip.expand_or_jumpable() then
-              luasnip.expand_or_jump()
-            elseif has_words_before() then
-              blink_cmp.complete()
-            else
-              fallback()
-            end
-          end,
-
-          ["<S-Tab>"] = function(fallback)
-            if blink_cmp.visible() then
-              blink_cmp.select_prev_item()
-            elseif luasnip.jumpable(-1) then
-              luasnip.jump(-1)
-            else
-              fallback()
-            end
-          end,
-
-          -- Scroll documentation
-          ["<C-d>"] = blink_cmp.scroll_docs(4),
-          ["<C-u>"] = blink_cmp.scroll_docs(-4),
-
-          -- Toggle completion
-          ["<C-Space>"] = blink_cmp.complete(),
-
-          -- Abort completion
-          ["<C-e>"] = blink_cmp.close(),
-
-          -- Previous/next item
-          ["<C-p>"] = blink_cmp.select_prev_item(),
-          ["<C-n>"] = blink_cmp.select_next_item(),
+        appearance = {
+          nerd_font_variant = "mono",
         },
-        sources = {
-          { name = "copilot" },
-          { name = "nvim_lsp" },
-          { name = "luasnip" },
-          { name = "path" },
-          { name = "buffer" },
+
+        fuzzy = {
+          implementation = "lua", -- Use Lua implementation as fallback
         },
-        formatting = {
-          format = lspkind.cmp_format({
-            mode = "symbol_text",
-            maxwidth = 50,
-            ellipsis_char = "...",
-            show_labelDetails = true,
-            symbol_map = {
-              Copilot = "",
-            },
-            -- Use rose-pine colors for completion menu
-            before = function(entry, vim_item)
-              local colors = require("rose-pine.palette")
-              vim_item.menu = vim_item.kind
-              vim_item.kind_hl_group = "CmpItemKind" .. vim_item.kind
 
-              -- Set up highlighting for completion items
-              local hl_groups = {
-                Text = colors.text,
-                Method = colors.iris,
-                Function = colors.iris,
-                Constructor = colors.pine,
-                Field = colors.foam,
-                Variable = colors.text,
-                Class = colors.gold,
-                Interface = colors.gold,
-                Module = colors.gold,
-                Property = colors.foam,
-                Unit = colors.gold,
-                Value = colors.pine,
-                Enum = colors.gold,
-                Keyword = colors.rose,
-                Snippet = colors.iris,
-                Color = colors.rose,
-                File = colors.text,
-                Reference = colors.text,
-                Folder = colors.text,
-                EnumMember = colors.pine,
-                Constant = colors.pine,
-                Struct = colors.gold,
-                Event = colors.rose,
-                Operator = colors.rose,
-                TypeParameter = colors.foam,
-                Copilot = colors.gold,
-              }
-
-              for kind, color in pairs(hl_groups) do
-                vim.api.nvim_set_hl(0, "CmpItemKind" .. kind, { fg = color })
-              end
-
-              return vim_item
-            end,
-          }),
-        },
-        experimental = {
-          ghost_text = true, -- Enable ghost text
-        },
-      })
-
-      -- Set up cmdline completion for / and ?
-      blink_cmp.setup_cmdline({ "/", "?" }, {
-        sources = {
-          { name = "buffer" },
-        },
-      })
-
-      -- Set up cmdline completion for :
-      blink_cmp.setup_cmdline(":", {
-        sources = {
-          { name = "path" },
-          { name = "cmdline" },
+        snippets = {
+          preset = "luasnip",
         },
       })
 
@@ -315,6 +206,31 @@ return {
 
       -- Enable luasnip for blink.cmp
       require("blink.compat").setup()
+
+      -- Configure cmdline manually inside a protected call
+      pcall(function()
+        vim.api.nvim_create_autocmd("CmdlineEnter", {
+          group = vim.api.nvim_create_augroup(
+            "blink_cmp_cmdline",
+            { clear = true }
+          ),
+          callback = function()
+            -- Setup command line completions manually when needed
+            local cmdtype = vim.fn.getcmdtype()
+            if cmdtype == "/" or cmdtype == "?" then
+              -- Search completions
+              blink_cmp.start(function()
+                return { providers = { "buffer" } }
+              end)
+            elseif cmdtype == ":" then
+              -- Command completions
+              blink_cmp.start(function()
+                return { providers = { "cmdline", "path" } }
+              end)
+            end
+          end,
+        })
+      end)
     end,
   },
 

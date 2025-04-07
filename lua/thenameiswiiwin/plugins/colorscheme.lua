@@ -1,4 +1,3 @@
--- Path: lua/thenameiswiiwin/plugins/colorscheme.lua
 return {
   {
     "rose-pine/neovim",

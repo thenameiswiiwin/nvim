@@ -1,4 +1,3 @@
--- Path: lua/thenameiswiiwin/plugins/formatting.lua
 return {
   -- Conform.nvim: Formatting engine
   {

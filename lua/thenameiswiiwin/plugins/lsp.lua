@@ -8,16 +8,10 @@ return {
       "williamboman/mason.nvim",
       "williamboman/mason-lspconfig.nvim",
 
-      -- Additional lua configuration
-      "folke/neodev.nvim",
-
       -- For schemas
       "b0o/SchemaStore.nvim",
     },
     config = function()
-      -- Setup neovim lua configuration
-      require("neodev").setup()
-
       -- Function to get capabilities with specified features
       local function make_capabilities(additional_capabilities)
         local capabilities = vim.lsp.protocol.make_client_capabilities()
