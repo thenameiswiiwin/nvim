@@ -45,6 +45,7 @@ return {
       "L3MON4D3/LuaSnip",
       "rafamadriz/friendly-snippets",
       "onsails/lspkind.nvim",
+      "giuxtaposition/blink-cmp-copilot",
       -- Add blink.compat for nvim-cmp source compatibility
       {
         "Saghen/blink.compat",
@@ -80,6 +81,14 @@ return {
 
         sources = {
           default = { "lsp", "copilot", "snippets", "path", "buffer" },
+          providers = {
+            copilot = {
+              name = "Copilot",
+              module = "blink-cmp-copilot",
+              score_offset = 100, -- Give Copilot suggestions high priority
+              async = true,
+            },
+          },
         },
 
         completion = {

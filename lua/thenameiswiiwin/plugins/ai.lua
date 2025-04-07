@@ -33,7 +33,6 @@ return {
             prev = "<C-p>",
             dismiss = "<C-e>",
           },
-          ai_accept = true, -- Add ai_accept action
         },
         filetypes = {
           -- Default filetypes
@@ -64,12 +63,11 @@ return {
     end,
   },
 
-  -- Copilot-cmp: Copilot source for completion
+  -- Copilot-cmp integration
   {
     "zbirenbaum/copilot-cmp",
     dependencies = {
       "zbirenbaum/copilot.lua",
-      "Saghen/blink.cmp",
     },
     config = function()
       require("copilot_cmp").setup({
@@ -81,18 +79,6 @@ return {
         event = { "InsertEnter", "LspAttach" },
         fix_pairs = true,
       })
-    end,
-  },
-
-  -- Blink-cmp-copilot: Integration for blink.cmp
-  {
-    "giuxtaposition/blink-cmp-copilot",
-    dependencies = {
-      "Saghen/blink.cmp",
-      "zbirenbaum/copilot-cmp",
-    },
-    config = function()
-      -- Automatically configured when dependencies are loaded
     end,
   },
 }
