@@ -12,6 +12,8 @@ return {
       "b0o/SchemaStore.nvim",
     },
     config = function()
+      -- Setup neovim lua configuration
+
       -- Function to get capabilities with specified features
       local function make_capabilities(additional_capabilities)
         local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -35,7 +37,7 @@ return {
         return capabilities
       end
 
-      -- Configure diagnostic display
+      -- Configure diagnostic display using vim.diagnostic.config()
       vim.diagnostic.config({
         underline = true,
         virtual_text = {
@@ -50,18 +52,15 @@ return {
           header = "",
           prefix = "",
         },
+        signs = {
+          text = {
+            [vim.diagnostic.severity.ERROR] = "✖ ",
+            [vim.diagnostic.severity.WARN] = "⚠ ",
+            [vim.diagnostic.severity.HINT] = "󰌶 ",
+            [vim.diagnostic.severity.INFO] = "ℹ ",
+          },
+        },
       })
-
-      -- Define diagnostic signs
-      for name, icon in pairs({
-        Error = "✖ ",
-        Warn = "⚠ ",
-        Hint = "󰌶 ",
-        Info = "ℹ ",
-      }) do
-        name = "DiagnosticSign" .. name
-        vim.fn.sign_define(name, { text = icon, texthl = name, numhl = name })
-      end
 
       -- Create a function for LSP on_attach
       local function on_attach(client, bufnr)
@@ -377,6 +376,25 @@ return {
     event = { "BufReadPre", "BufNewFile" },
     opts = {
       automatic_installation = true,
+    },
+  },
+
+  -- Enhanced Lua development support
+  {
+    "folke/lazydev.nvim",
+    ft = "lua",
+    opts = {
+      library = {
+        -- Load plugins you're actively developing
+        vim.fn.stdpath("data") .. "/lazy",
+        -- Additional paths can be added here
+        -- "/path/to/your/library"
+      },
+      -- Disable neodev integration
+      integrations = {
+        lspconfig = true,
+        cmp = true,
+      },
     },
   },
 }
