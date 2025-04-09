@@ -26,18 +26,16 @@ return {
           on_new_config = function(new_config)
             new_config.settings.json.schemas = new_config.settings.json.schemas
               or {}
-            vim.list_extend(
-              new_config.settings.json.schemas,
-              require("schemastore").json.schemas()
-            )
-          end,
-          settings = {
-            json = {
-              format = {
-                enable = true,
-              },
-              validate = { enable = true },
-              schemas = {
+            -- Only load schemastore when needed
+            local has_schemastore, schemastore = pcall(require, "schemastore")
+            if has_schemastore then
+              vim.list_extend(
+                new_config.settings.json.schemas,
+                schemastore.json.schemas()
+              )
+            else
+              -- Fallback to basic schemas
+              vim.list_extend(new_config.settings.json.schemas, {
                 {
                   fileMatch = { "package.json" },
                   url = "https://json.schemastore.org/package.json",
@@ -54,8 +52,25 @@ return {
                   fileMatch = { ".eslintrc", ".eslintrc.json" },
                   url = "https://json.schemastore.org/eslintrc.json",
                 },
+              })
+            end
+          end,
+          settings = {
+            json = {
+              format = {
+                enable = true,
+              },
+              validate = { enable = true },
+              -- Performance optimizations
+              maxItemsComputed = 2000, -- Limit computed items
+              keepLines = {
+                onFormatting = true, -- Keep lines on formatting
               },
             },
+          },
+          -- Performance optimizations
+          flags = {
+            debounce_text_changes = 150, -- Reduce text change frequency
           },
         },
       },

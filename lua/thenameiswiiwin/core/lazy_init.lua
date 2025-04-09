@@ -73,13 +73,11 @@ require("lazy").setup({
 
   -- Change detection options
   change_detection = {
-    notify = false,
+    notify = false, -- Disable notifications on config changes
   },
 
-  -- Profile plugin loading (for debugging if needed)
+  -- Profile plugin loading (disabled for better performance)
   profiling = {
-    -- Set to true to enable profiling
     enabled = false,
-    threshold = 1, -- Minimum time in ms to include in profiling report
   },
 })

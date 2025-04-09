@@ -32,7 +32,7 @@ return {
         vue = { "prettierd" },
 
         -- Go
-        go = { "gofumpt", "goimports" },
+        go = { "gofumpt" },
 
         -- Rust
         rust = { "rustfmt" },
@@ -52,17 +52,21 @@ return {
         shfmt = {
           prepend_args = { "-i", "2", "-ci" },
         },
-        prettier = {
+        prettierd = {
           env = {
             PRETTIERD_DEFAULT_CONFIG = vim.fn.stdpath("config")
               .. "/.prettierrc.json",
           },
+          timeout_ms = 1000, -- Increase timeout for better reliability
+        },
+        stylua = {
+          prepend_args = { "--indent-width", "2", "--indent-type", "Spaces" },
         },
       },
 
       -- Performance optimization settings
       format_after_save = false,
-      notify_on_error = true,
+      notify_on_error = false, -- Disable notifications for better performance
       log_level = vim.log.levels.ERROR,
     },
     init = function()
@@ -106,6 +110,24 @@ return {
           package_pending = "➜",
           package_uninstalled = "✗",
         },
+        keymaps = {
+          -- Keymap for toggling package expand
+          toggle_package_expand = "<CR>",
+          -- Keymap for installing the package under the cursor
+          install_package = "i",
+          -- Keymap for updating the package under the cursor
+          update_package = "u",
+          -- Keymap for checking for new version of the package under the cursor
+          check_package_version = "c",
+          -- Keymap for checking outdated packages
+          check_outdated_packages = "C",
+          -- Keymap for uninstalling the package under the cursor
+          uninstall_package = "X",
+          -- Keymap for cancelling a package installation
+          cancel_installation = "<C-c>",
+          -- Keymap for applying language filter
+          apply_language_filter = "<C-f>",
+        },
       },
       ensure_installed = {
         -- Lua
@@ -113,17 +135,14 @@ return {
 
         -- Web development
         "prettierd",
-        "prettier",
         "eslint_d",
 
         -- Go
         "gofumpt",
-        "goimports",
         "delve",
 
         -- PHP
         "php-cs-fixer",
-        "phpactor",
         "intelephense",
 
         -- Bash
@@ -136,18 +155,24 @@ return {
         "codelldb",
       },
       max_concurrent_installers = 10, -- Speed up installation
+      -- Performance optimizations
+      install = {
+        -- Timeout in milliseconds for package installation
+        timeout_ms = 300000, -- 5 minutes
+      },
     },
     config = function(_, opts)
       require("mason").setup(opts)
       local mr = require("mason-registry")
       mr:on("package:install:success", function()
+        -- Use defer_fn to slightly delay the reload
         vim.defer_fn(function()
           -- Trigger FileType event to load newly installed LSP servers
           require("lazy.core.handler.event").trigger({
             event = "FileType",
             buf = vim.api.nvim_get_current_buf(),
           })
-        end, 100)
+        end, 200)
       end)
 
       -- Install configured packages
@@ -160,11 +185,14 @@ return {
         end
       end
 
-      if mr.refresh then
-        mr.refresh(ensure_installed)
-      else
-        ensure_installed()
-      end
+      -- Defer the registry refresh and installation
+      vim.defer_fn(function()
+        if mr.refresh then
+          mr.refresh(ensure_installed)
+        else
+          ensure_installed()
+        end
+      end, 100)
     end,
   },
 }

@@ -216,7 +216,6 @@ return {
   -- Todo-comments: Highlight and search TODOs
   {
     "folke/todo-comments.nvim",
-    cmd = { "TodoTrouble", "TodoTelescope" },
     event = { "BufReadPost", "BufNewFile" },
     opts = {
       signs = true,
@@ -260,7 +259,7 @@ return {
       },
     },
     keys = {
-      { "<leader>ft", "<cmd>TodoTelescope<cr>", desc = "Find TODOs" },
+      { "<leader>ft", ":TodoFzfLua<cr>", desc = "Find TODOs" },
       { "<leader>xt", "<cmd>TodoTrouble<cr>", desc = "TODOs (Trouble)" },
     },
   },
@@ -389,8 +388,7 @@ return {
     opts = {
       columns = {
         "icon",
-        "size",
-        "mtime",
+        -- Don't include size/mtime for faster directory loading
       },
       view_options = {
         show_hidden = true,
@@ -411,20 +409,33 @@ return {
       },
       use_default_keymaps = false,
       skip_confirm_for_simple_edits = true,
-      cleanup_delay_ms = 0,
-      delete_to_trash = true,
-      -- Path: lua/thenameiswiiwin/plugins/editor.lua (continued)
+      cleanup_delay_ms = 0, -- Immediate cleanup for better performance
+      delete_to_trash = false, -- Faster than moving to trash
       prompt_save_on_select_new_entry = true,
-      -- Performance optimizations
       buffers = {
         show_hidden_files = true,
         file_explorer = true,
         only_show_dirs = false,
       },
+      -- Performance optimizations
+      preview = {
+        -- Disable preview for faster navigation
+        max_width = 0,
+        min_width = 0,
+        delay_ms = 0,
+      },
+      -- Faster directory loading
+      progress = {
+        enable = false, -- Disable progress bar for better performance
+      },
+      win_options = {
+        wrap = false, -- Don't wrap filenames
+        signcolumn = "no", -- Disable sign column for cleaner view
+      },
     },
   },
 
-  -- Add zen-mode for focused editing
+  -- Zen-mode for focused editing
   {
     "folke/zen-mode.nvim",
     cmd = "ZenMode",
@@ -483,6 +494,9 @@ return {
     config = function()
       local fzf = require("fzf-lua")
       fzf.setup({
+        -- Use the 'silent=true' flag to hide deprecation messages
+        silent = true,
+
         winopts = {
           height = 0.85,
           width = 0.80,
@@ -500,110 +514,71 @@ return {
             title = true,
             delay = 100,
           },
+          hls = {
+            border = "Comment",
+            scrollbar = "PmenuSbar",
+          },
         },
+
         keymap = {
+          -- Neovim terminal mappings for the fzf window
           builtin = {
-            ["<C-/>"] = "toggle-help",
-            ["<C-q>"] = "toggle-fullscreen",
-            ["<C-r>"] = "toggle-preview-wrap",
-            ["<C-p>"] = "toggle-preview",
-            ["<C-y>"] = "preview-page-up",
-            ["<C-e>"] = "preview-page-down",
-            ["<C-d>"] = "preview-page-down",
-            ["<C-u>"] = "preview-page-up",
+            ["<M-Esc>"] = "hide",
+            ["<F1>"] = "toggle-help",
+            ["<F2>"] = "toggle-fullscreen",
+            ["<F3>"] = "toggle-preview-wrap",
+            ["<F4>"] = "toggle-preview",
+            ["<F5>"] = "toggle-preview-ccw",
+            ["<F6>"] = "toggle-preview-cw",
+            ["<S-Left>"] = "preview-reset",
+            ["<S-down>"] = "preview-page-down",
+            ["<S-up>"] = "preview-page-up",
+            ["<M-S-down>"] = "preview-down",
+            ["<M-S-up>"] = "preview-up",
           },
           fzf = {
             ["ctrl-z"] = "abort",
+            ["ctrl-u"] = "unix-line-discard",
             ["ctrl-f"] = "half-page-down",
             ["ctrl-b"] = "half-page-up",
             ["ctrl-a"] = "beginning-of-line",
             ["ctrl-e"] = "end-of-line",
             ["alt-a"] = "toggle-all",
-            ["ctrl-]"] = "toggle-preview",
           },
-        },
-        fzf_opts = {
-          -- options are sent as `k=v` pairs to fzf
-          ["--layout"] = "reverse",
-          ["--info"] = "inline-right",
-        },
-        previewers = {
-          cat = {
-            cmd = "cat",
-            args = "--number",
-          },
-          bat = {
-            cmd = "bat",
-            args = "--style=numbers,changes --color always",
-            theme = "tokyonight_night",
-          },
-        },
-        files = {
-          prompt = "Files❯ ",
-          cmd = "fd --type f --hidden --follow --exclude .git --exclude node_modules",
-          git_icons = true,
-          file_icons = true,
-          color_icons = true,
-        },
-        grep = {
-          prompt = "Rg❯ ",
-          input_prompt = "Grep For❯ ",
-          cmd = "rg --color=always --line-number --no-heading --smart-case --hidden --glob='!.git' --glob='!node_modules'",
-          -- Performance optimizations
-          rg_opts = "--column --line-number --no-heading --color=always --smart-case --max-columns=4096",
-          no_header = false, -- hide grep|cwd header?
-          no_header_i = false, -- hide interactive header?
-          multiprocess = true, -- use multiprocess when grep
         },
 
-        -- Performance optimization settings
-        performance = {
-          async_job_timeout = 1000, -- timeout jobs after 1000ms
-          history = {
-            path = vim.fn.stdpath("data") .. "/fzf-lua-history",
-            limit = 1000,
-          },
+        fzf_opts = {
+          ["--ansi"] = true,
+          ["--info"] = "inline-right",
+          ["--height"] = "100%",
+          ["--layout"] = "reverse",
+          ["--border"] = "none",
+        },
+
+        files = {
+          prompt = "Files❯ ",
+          multiprocess = true,
+          git_icons = false,
+          file_icons = true,
+          color_icons = true,
+          fd_opts = "--type f --color=never --hidden --follow --exclude .git --exclude node_modules --exclude '*.so' --exclude '*.o' --exclude '*.obj' --exclude '*.bin' --exclude '*.dll'",
+          rg_opts = "--files --hidden --follow -g '!.git' -g '!node_modules' -g '!*.{so,o,obj,bin,dll}'",
+          hidden = true,
+          -- Use a faster way of filtering files
+          find_opts = "-type f -not -path '*/\\.*' -not -path '*/node_modules/*' -not -path '*/build/*' -not -path '*/dist/*' -not -path '*/target/*'",
+        },
+
+        grep = {
+          prompt = "Rg❯ ",
+          multiprocess = true,
+          git_icons = false,
+          file_icons = true,
+          color_icons = true,
+          rg_opts = "--column --line-number --no-heading --color=always --smart-case --max-columns=4096 -e",
         },
       })
 
-      -- Set up LSP integration for code navigation
-      local lsp_fzf = function(method, opts)
-        return function()
-          opts = opts or {}
-          require("fzf-lua").lsp_document_symbols({
-            symbol_names = {
-              File = "File",
-              Module = "Module",
-              Namespace = "Namespace",
-              Package = "Package",
-              Class = "Class",
-              Method = "Method",
-              Property = "Property",
-              Field = "Field",
-              Constructor = "Constructor",
-              Enum = "Enum",
-              Interface = "Interface",
-              Function = "Function",
-              Variable = "Variable",
-              Constant = "Constant",
-              String = "String",
-              Number = "Number",
-              Boolean = "Boolean",
-              Array = "Array",
-              Object = "Object",
-              Key = "Key",
-              Null = "Null",
-              EnumMember = "EnumMember",
-              Struct = "Struct",
-              Event = "Event",
-              Operator = "Operator",
-              TypeParameter = "TypeParameter",
-            },
-          })
-        end
-      end
-
-      -- Replace common Telescope mappings with FZF-lua
+      -- FZF-lua mappings
       vim.keymap.set("n", "<leader>ff", fzf.files, { desc = "Find files" })
       vim.keymap.set("n", "<leader>fg", fzf.live_grep, { desc = "Live grep" })
       vim.keymap.set("n", "<leader>fb", fzf.buffers, { desc = "Buffers" })

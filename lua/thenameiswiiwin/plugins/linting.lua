@@ -35,7 +35,7 @@ return {
       -- Enable Rust clippy
       lint.linters.clippy = {
         cmd = "cargo",
-        args = { "clippy", "--message-format=json" },
+        args = { "clippy", "--message-format=json", "--quiet" }, -- Add quiet flag for better performance
         stdin = false,
         append_fname = false,
         stream = "both",
@@ -45,7 +45,7 @@ return {
       local lint_augroup =
         vim.api.nvim_create_augroup("nvim-lint", { clear = true })
 
-      -- Throttled lint function
+      -- Throttled lint function with increased throttle delay
       local lint_timer = nil
       local function lint_throttled()
         if lint_timer then
@@ -53,13 +53,28 @@ return {
         end
 
         lint_timer = vim.defer_fn(function()
+          -- Check if the file exists and isn't too large
+          local fname = vim.api.nvim_buf_get_name(0)
+          local ok, stats = pcall(vim.loop.fs_stat, fname)
+
+          -- Skip linting for large files
+          if ok and stats and stats.size > 500 * 1024 then -- 500KB
+            return
+          end
+
+          -- Skip linting in insert mode
+          if vim.fn.mode() == "i" then
+            return
+          end
+
           lint.try_lint()
           lint_timer = nil
-        end, 300) -- 300ms throttle
+        end, 500) -- 500ms throttle (increased from 300ms for better performance)
       end
 
+      -- Less frequent linting for better performance
       vim.api.nvim_create_autocmd(
-        { "BufWritePost", "BufReadPost", "InsertLeave" },
+        { "BufWritePost", "BufReadPost" }, -- Removed InsertLeave for better performance
         {
           group = lint_augroup,
           callback = function()

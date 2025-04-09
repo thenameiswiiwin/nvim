@@ -12,7 +12,7 @@ return {
         disable_float_background = false,
         disable_italics = false,
 
-        -- Improve performance by disabling unused highlight groups
+        -- Improve performance by limiting highlight groups
         highlight_groups = {
           -- Enhance current line number
           CursorLineNr = { fg = "gold" },
@@ -20,9 +20,7 @@ return {
           SignColumn = { bg = "none" },
           -- Optimize inactive windows
           ColorColumn = { bg = "surface" },
-          -- Optimize panels
-          PanelHeading = { fg = "foam", bg = "surface", bold = true },
-          -- Optimize specific plugin elements
+          -- Optimize Git signs for better performance
           GitSignsAdd = { fg = "foam" },
           GitSignsChange = { fg = "rose" },
           GitSignsDelete = { fg = "love" },

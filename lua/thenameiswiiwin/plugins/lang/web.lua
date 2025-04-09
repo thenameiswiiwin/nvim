@@ -15,7 +15,18 @@ return {
     opts = {
       servers = {
         -- HTML language server
-        html = {},
+        html = {
+          -- Performance optimization
+          filetypes = { "html" },
+          init_options = {
+            configurationSection = { "html", "css", "javascript" },
+            embeddedLanguages = {
+              css = true,
+              javascript = true,
+            },
+            provideFormatter = false, -- Use conform.nvim instead
+          },
+        },
 
         -- CSS language server
         cssls = {
@@ -24,6 +35,8 @@ return {
             scss = { validate = true },
             less = { validate = true },
           },
+          -- Performance optimizations
+          filetypes = { "css", "scss", "less" },
         },
 
         -- TailwindCSS language server
@@ -37,39 +50,31 @@ return {
             "typescript",
             "typescriptreact",
             "vue",
-            "svelte",
           },
           settings = {
             tailwindCSS = {
               experimental = {
                 classRegex = {
-                  "tw`([^`]*)",
-                  'tw="([^"]*)',
-                  'tw={"([^"}]*)',
-                  "tw\\.\\w+`([^`]*)",
-                  "tw\\(.*?\\)`([^`]*)",
                   { 'className="([^"]*)"', '"([^"]*)"' },
                   { 'class="([^"]*)"', '"([^"]*)"' },
-                  { 'className={"([^"}]*)"}', '"([^"]*)"' },
-                  { "className={`([^`]*)`}", "`([^`]*)`" },
                 },
+              },
+              -- Performance optimizations
+              validate = true,
+              lint = {
+                cssConflict = "warning",
+                invalidApply = "error",
+                invalidScreen = "error",
+                invalidVariant = "error",
+                invalidConfigPath = "error",
+                invalidTailwindDirective = "error",
+                recommendedVariantOrder = "warning",
               },
             },
           },
         },
       },
     },
-  },
-
-  -- TailwindCSS colorizer integration
-  {
-    "roobert/tailwindcss-colorizer-cmp.nvim",
-    event = { "BufRead *.{html,css,scss,js,jsx,ts,tsx,vue,svelte}" },
-    config = function()
-      require("tailwindcss-colorizer-cmp").setup({
-        color_square_width = 2,
-      })
-    end,
   },
 
   -- Ensure Mason installs web tools

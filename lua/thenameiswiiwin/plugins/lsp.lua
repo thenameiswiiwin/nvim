@@ -12,8 +12,6 @@ return {
       "b0o/SchemaStore.nvim",
     },
     config = function()
-      -- Setup neovim lua configuration
-
       -- Function to get capabilities with specified features
       local function make_capabilities(additional_capabilities)
         local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -34,6 +32,17 @@ return {
           capabilities =
             vim.tbl_deep_extend("force", capabilities, additional_capabilities)
         end
+
+        -- Add capabilities from nvim-cmp
+        local has_cmp, cmp_lsp = pcall(require, "cmp_nvim_lsp")
+        if has_cmp then
+          capabilities = vim.tbl_deep_extend(
+            "force",
+            capabilities,
+            cmp_lsp.default_capabilities()
+          )
+        end
+
         return capabilities
       end
 
@@ -43,8 +52,9 @@ return {
         virtual_text = {
           spacing = 4,
           prefix = "●",
+          severity = { min = vim.diagnostic.severity.WARN }, -- Only show warnings and errors
         },
-        update_in_insert = false,
+        update_in_insert = false, -- Don't update diagnostics in insert mode
         severity_sort = true,
         float = {
           source = "always",
@@ -78,11 +88,31 @@ return {
           end)
         end
 
-        -- Enable document formatting if supported
-        if client.supports_method("textDocument/formatting") then
-          vim.api.nvim_buf_create_user_command(bufnr, "LspFormat", function()
-            vim.lsp.buf.format({ async = true })
-          end, { desc = "Format using LSP" })
+        -- Disable formatting for certain LSP servers
+        if client.name == "tsserver" or client.name == "vtsls" then
+          client.server_capabilities.documentFormattingProvider = false
+        end
+
+        -- Add keymap to toggle inlay hints
+        vim.keymap.set("n", "<leader>th", function()
+          -- Using pcall to handle API differences across Neovim versions
+          pcall(function()
+            if vim.fn.has("nvim-0.10") == 1 then
+              -- For Neovim 0.10+
+              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+            else
+              -- For older versions
+              vim.lsp.inlay_hint.enable(0, not vim.lsp.inlay_hint.is_enabled(0))
+            end
+          end)
+        end, { buffer = bufnr, desc = "Toggle inlay hints" })
+        -- Limit workspace size for large projects
+        if client.name == "gopls" or client.name == "vtsls" then
+          client.config.settings = client.config.settings or {}
+          client.config.settings.workspace = client.config.settings.workspace
+            or {}
+          client.config.settings.workspace.maxFileSize = 1024 * 1024 -- 1MB
+          client.config.settings.workspace.maxFiles = 5000 -- Max 5000 files
         end
       end
 
@@ -96,6 +126,17 @@ return {
               telemetry = { enable = false },
               diagnostics = { globals = { "vim" } },
               completion = { callSnippet = "Replace" },
+              -- Performance optimizations
+              performance = {
+                enable = true,
+                maxPreload = 1000,
+                preloadFileSize = 1000,
+              },
+              hint = {
+                enable = true,
+                setType = true,
+                paramType = true,
+              },
             },
           },
         },
@@ -103,52 +144,47 @@ return {
         -- Web development
         vtsls = {
           settings = {
-            complete_function_calls = true,
             typescript = {
-              updateImportsOnFileMove = { enabled = "always" },
-              suggest = { completeFunctionCalls = true },
               inlayHints = {
-                enumMemberValues = { enabled = true },
-                functionLikeReturnTypes = { enabled = true },
+                -- Limit inlay hints for better performance
+                enumMemberValues = { enabled = false },
                 parameterNames = { enabled = "literals" },
-                parameterTypes = { enabled = true },
-                propertyDeclarationTypes = { enabled = true },
+                parameterTypes = { enabled = false },
+                propertyDeclarationTypes = { enabled = false },
                 variableTypes = { enabled = false },
               },
             },
           },
-          filetypes = {
-            "javascript",
-            "javascriptreact",
-            "javascript.jsx",
-            "typescript",
-            "typescriptreact",
-            "typescript.tsx",
+          -- Performance optimizations
+          flags = {
+            debounce_text_changes = 150,
           },
         },
         volar = {
           init_options = {
             vue = { hybridMode = true },
           },
-          filetypes = { "vue", "typescript", "javascript" },
+          filetypes = { "vue" },
         },
-        eslint = {},
+        eslint = {
+          settings = {
+            -- Run on save instead of change
+            run = "onSave",
+          },
+        },
 
         -- Go
         gopls = {
-          cmd = { "gopls" }, -- Explicitly set the command
           settings = {
             gopls = {
               gofumpt = true,
+              -- Disable unused codelenses for better performance
               codelenses = {
                 gc_details = false,
-                generate = true,
-                regenerate_cgo = true,
-                run_govulncheck = true,
                 test = true,
-                tidy = true,
-                upgrade_dependency = true,
-                vendor = true,
+                tidy = false,
+                upgrade_dependency = false,
+                vendor = false,
               },
               hints = {
                 assignVariableTypes = true,
@@ -165,18 +201,12 @@ return {
                 unusedwrite = true,
                 useany = true,
               },
-              usePlaceholders = true,
-              completeUnimported = true,
               staticcheck = true,
-              directoryFilters = {
-                "-.git",
-                "-.vscode",
-                "-.idea",
-                "-.vscode-test",
-                "-node_modules",
-              },
-              semanticTokens = true,
             },
+          },
+          -- Performance optimizations
+          flags = {
+            debounce_text_changes = 150,
           },
         },
 
@@ -184,88 +214,31 @@ return {
         intelephense = {
           settings = {
             intelephense = {
+              -- Limit stubs to essentials for better performance
               stubs = {
-                "apache",
-                "bcmath",
-                "bz2",
-                "calendar",
-                "com_dotnet",
                 "Core",
-                "ctype",
-                "curl",
                 "date",
-                "dba",
-                "dom",
-                "enchant",
-                "exif",
-                "FFI",
-                "fileinfo",
-                "filter",
-                "fpm",
-                "ftp",
-                "gd",
-                "gettext",
-                "gmp",
-                "hash",
-                "iconv",
-                "imap",
-                "intl",
-                "json",
-                "ldap",
-                "libxml",
-                "mbstring",
-                "meta",
-                "mysqli",
-                "oci8",
-                "odbc",
-                "openssl",
-                "pcntl",
                 "pcre",
-                "PDO",
-                "pdo_ibm",
-                "pdo_mysql",
-                "pdo_pgsql",
-                "pdo_sqlite",
-                "pgsql",
-                "Phar",
-                "posix",
-                "pspell",
-                "readline",
-                "Reflection",
-                "session",
-                "shmop",
-                "SimpleXML",
-                "snmp",
-                "soap",
-                "sockets",
-                "sodium",
-                "SPL",
-                "sqlite3",
                 "standard",
                 "superglobals",
-                "sysvmsg",
-                "sysvsem",
-                "sysvshm",
-                "tidy",
-                "tokenizer",
-                "xml",
-                "xmlreader",
-                "xmlrpc",
-                "xmlwriter",
-                "xsl",
-                "Zend OPcache",
-                "zip",
-                "zlib",
-                "wordpress",
-                "phpunit",
+                "SPL",
+                "mysqli",
+                "pdo",
+                "pdo_mysql",
               },
               files = {
-                maxSize = 5000000,
+                maxSize = 1000000, -- Limit max file size
+              },
+              environment = {
+                includePaths = { "vendor" },
+              },
+              -- Performance optimizations
+              diagnostics = {
+                run = "onSave", -- Only run on save
               },
             },
           },
         },
-        phpactor = {},
 
         -- Rust
         rust_analyzer = {
@@ -276,13 +249,16 @@ return {
                 loadOutDirsFromCheck = true,
                 buildScripts = { enable = true },
               },
+              checkOnSave = {
+                command = "clippy",
+                extraArgs = { "--no-deps" }, -- Skip analyzing dependencies
+              },
               procMacro = { enable = true },
-              checkOnSave = true,
             },
           },
         },
 
-        -- TailwindCSS
+        -- Tailwind CSS
         tailwindcss = {
           filetypes = {
             "html",
@@ -293,29 +269,28 @@ return {
             "typescript",
             "typescriptreact",
             "vue",
-            "svelte",
           },
           settings = {
             tailwindCSS = {
               experimental = {
                 classRegex = {
-                  "tw`([^`]*)",
-                  'tw="([^"]*)',
-                  'tw={"([^"}]*)',
-                  "tw\\.\\w+`([^`]*)",
-                  "tw\\(.*?\\)`([^`]*)",
                   { 'className="([^"]*)"', '"([^"]*)"' },
                   { 'class="([^"]*)"', '"([^"]*)"' },
-                  { 'className={"([^"}]*)"}', '"([^"]*)"' },
-                  { "className={`([^`]*)`}", "`([^`]*)`" },
                 },
+              },
+              -- Performance optimizations
+              lint = {
+                cssConflict = "warning",
+                invalidApply = "error",
+                invalidScreen = "error",
+                invalidVariant = "error",
+                invalidConfigPath = "error",
+                invalidTailwindDirective = "error",
+                recommendedVariantOrder = "warning",
               },
             },
           },
         },
-
-        -- Bash
-        bashls = {},
 
         -- JSON with schema support
         jsonls = {
@@ -353,20 +328,6 @@ return {
           end,
         },
       })
-
-      -- LSP features keymaps
-      vim.keymap.set("n", "<leader>th", function()
-        -- Using pcall to handle API differences across Neovim versions
-        pcall(function()
-          if vim.fn.has("nvim-0.10") == 1 then
-            -- For Neovim 0.10+
-            vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
-          else
-            -- For older versions
-            vim.lsp.inlay_hint.enable(0, not vim.lsp.inlay_hint.is_enabled(0))
-          end
-        end)
-      end, { desc = "Toggle inlay hints" })
     end,
   },
 
@@ -374,6 +335,7 @@ return {
   {
     "williamboman/mason-lspconfig.nvim",
     event = { "BufReadPre", "BufNewFile" },
+    dependencies = { "williamboman/mason.nvim" },
     opts = {
       automatic_installation = true,
     },
@@ -387,10 +349,8 @@ return {
       library = {
         -- Load plugins you're actively developing
         vim.fn.stdpath("data") .. "/lazy",
-        -- Additional paths can be added here
-        -- "/path/to/your/library"
       },
-      -- Disable neodev integration
+      -- Integrations
       integrations = {
         lspconfig = true,
         cmp = true,

@@ -1,4 +1,14 @@
 local opt = vim.opt
+local g = vim.g
+
+g.loaded_node_provider = 0
+g.loaded_ruby_provider = 0
+g.loaded_perl_provider = 0
+g.loaded_python3_provider = 0
+g.loaded_python_provider = 0
+
+-- Disable shada file for faster startup
+opt.shadafile = "NONE"
 
 -- Use block cursor
 opt.guicursor = ""
@@ -75,7 +85,7 @@ vim.diagnostic.config({
   },
 })
 
--- Statuscolumn setup
+-- Statuscolumn setup (minimal)
 opt.statuscolumn = "%=%{v:relnum?v:relnum:v:lnum} %s"
 
 -- Fold settings for better performance
@@ -95,8 +105,8 @@ opt.ttyfast = true -- Faster terminal rendering
 opt.redrawtime = 1500 -- Time in milliseconds for abandoning redraw
 opt.ttimeoutlen = 10 -- Short key code timeout
 
--- Disable providers not needed (improves startup time)
-vim.g.loaded_python3_provider = 0
-vim.g.loaded_ruby_provider = 0
-vim.g.loaded_node_provider = 0
-vim.g.loaded_perl_provider = 0
+-- Clipboard
+opt.clipboard = "unnamedplus" -- Use system clipboard
+
+-- Don't redraw during macros for better performance
+opt.lazyredraw = true

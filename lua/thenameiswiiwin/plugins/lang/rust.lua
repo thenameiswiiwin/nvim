@@ -4,7 +4,7 @@ return {
     "nvim-treesitter/nvim-treesitter",
     opts = function(_, opts)
       if type(opts.ensure_installed) == "table" then
-        vim.list_extend(opts.ensure_installed, { "rust", "ron", "toml" })
+        vim.list_extend(opts.ensure_installed, { "rust", "toml" })
       end
     end,
   },
@@ -16,8 +16,7 @@ return {
     config = function()
       require("crates").setup({
         null_ls = {
-          enabled = true,
-          name = "crates.nvim",
+          enabled = false, -- Disable null-ls for better performance
         },
         popup = {
           border = "rounded",
@@ -29,24 +28,24 @@ return {
             local crates = require("crates")
             local opts = { silent = true, buffer = bufnr }
 
-            -- Set keymaps for Cargo.toml files
+            -- Reduce keymaps to essential ones for performance
             vim.keymap.set("n", "<leader>ct", crates.toggle, opts)
             vim.keymap.set("n", "<leader>cr", crates.reload, opts)
             vim.keymap.set("n", "<leader>cv", crates.show_versions_popup, opts)
             vim.keymap.set("n", "<leader>cf", crates.show_features_popup, opts)
-            vim.keymap.set(
-              "n",
-              "<leader>cd",
-              crates.show_dependencies_popup,
-              opts
-            )
             vim.keymap.set("n", "<leader>cu", crates.update_crate, opts)
             vim.keymap.set("v", "<leader>cu", crates.update_crates, opts)
             vim.keymap.set("n", "<leader>ca", crates.update_all_crates, opts)
-            vim.keymap.set("n", "<leader>cU", crates.upgrade_crate, opts)
-            vim.keymap.set("v", "<leader>cU", crates.upgrade_crates, opts)
-            vim.keymap.set("n", "<leader>cA", crates.upgrade_all_crates, opts)
           end,
+        },
+        -- Performance optimizations
+        loading_indicator = true, -- Provide feedback during loading
+        crates_cache = true, -- Enable crates cache
+        crates_cache_path = vim.fn.stdpath('cache') .. '/crates-nvim', -- Cache path
+        disable_invalid_feature_diagnostic = false, -- Disable some diags
+        text_style = {
+          version = { bold = false }, -- Disable bold
+          feature = { bold = false }, -- Disable bold
         },
       })
     end,
@@ -63,12 +62,13 @@ return {
               cargo = {
                 allFeatures = true,
                 loadOutDirsFromCheck = true,
-                buildScripts = {
-                  enable = true,
-                },
+                buildScripts = { enable = true },
               },
-              checkOnSave = true,
-              procMacro = {
+              checkOnSave = {
+                command = "clippy", 
+                extraArgs = { "--no-deps" }, -- Skip analyzing dependencies
+              },
+              procMacro = { 
                 enable = true,
                 ignored = {
                   ["async-trait"] = { "async_trait" },
@@ -89,7 +89,25 @@ return {
                   ".venv",
                 },
               },
+              -- Performance optimizations
+              cachePriming = {
+                numThreads = 4, -- Limit threads
+                enable = true, 
+              },
+              diagnostics = {
+                disabled = {"inactive-code"}, -- Disable some diagnostics
+                experimental = {
+                  enable = false, -- Disable experimental diagnostics
+                },
+              },
+              lru = {
+                capacity = 128, -- Reduce memory usage
+              },
             },
+          },
+          -- Performance optimizations
+          flags = {
+            debounce_text_changes = 150, -- Reduce text change frequency
           },
         },
       },

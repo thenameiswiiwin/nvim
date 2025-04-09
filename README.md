@@ -1,486 +1,494 @@
-# Comprehensive Neovim Configuration Guide
+# Optimized Neovim Configuration
 
-This guide will walk you through all the features of your optimized Neovim configuration, explaining use cases, when to use each feature, and detailed explanations of all keymaps.
+A fast, feature-rich Neovim configuration optimized for performance and efficiency. This setup is designed for developers who need a powerful environment without lag or delays. It supports multiple programming languages with LSP integration, modern UI, testing frameworks, and debugging capabilities.
 
-## Core Features and Their Use Cases
+## Table of Contents
 
-### 1. Catppuccin Mocha Theme
+- [Overview](#overview)
+- [Installation](#installation)
+- [Core Features](#core-features)
+- [Performance Optimizations](#performance-optimizations)
+- [Plugin Details](#plugin-details)
+  - [User Interface](#user-interface)
+  - [Navigation](#navigation)
+  - [Editing and Coding](#editing-and-coding)
+  - [Git Integration](#git-integration)
+  - [LSP (Language Server Protocol)](#lsp-language-server-protocol)
+  - [Language Support](#language-support)
+  - [Testing and Debugging](#testing-and-debugging)
+  - [AI Assistance](#ai-assistance)
+- [Key Mappings](#key-mappings)
+  - [General](#general-keymaps)
+  - [File Navigation](#file-navigation-keymaps)
+  - [Editing](#editing-keymaps)
+  - [LSP and Code Actions](#lsp-and-code-actions-keymaps)
+  - [Git Operations](#git-operations-keymaps)
+  - [Testing](#testing-keymaps)
+  - [Debugging](#debugging-keymaps)
+- [Language Server Setup](#language-server-setup)
+- [Customization](#customization)
+- [Troubleshooting](#troubleshooting)
 
-**Purpose**: Provides a pleasant, low-contrast dark theme with carefully selected colors that reduce eye strain during long coding sessions.
+## Overview
 
-**When to use it**: This is your default colorscheme and is always active. It's particularly beneficial in low-light environments or for extended coding sessions.
+This Neovim configuration focuses on performance, rapid startup time, and efficient resource usage while providing a rich development environment. Key optimizations include:
 
-**Features**:
+- Lazy-loading plugins on demand
+- Optimized LSP configurations with performance tuning
+- Efficient UI elements with minimal overhead
+- Advanced file navigation with `fzf-lua` and `oil.nvim`
+- Performance safeguards for large files
+- Comprehensive language support with custom optimizations
+- Modern coding features (completion, snippets, linting, formatting)
 
-- Semantic highlighting that helps distinguish different code elements
-- Specially tuned for web development languages like JavaScript, TypeScript, HTML, and CSS
-- Optimized contrast ratios for improved readability
-- Integration with plugins like Telescope, Git signs, and LSP to ensure visual consistency
+## Installation
 
-### 2. Oil.nvim File Explorer
+### Prerequisites
 
-**Purpose**: A minimal file explorer that lets you navigate and manipulate your file system without leaving the Neovim buffer system.
+- Neovim 0.9.0 or higher
+- Git
+- A Nerd Font (for icons)
+- Node.js (for some language servers)
+- `ripgrep` (for fast file search)
+- `fd` (for file finding)
 
-**When to use it**:
+### Basic Installation
 
-- When you need to browse directory structures
-- When creating, renaming, moving, or deleting files
-- When you want to perform file operations without opening a separate tool
+1. Back up your existing Neovim configuration if you have one:
 
-**Features**:
+```bash
+mv ~/.config/nvim ~/.config/nvim.bak
+```
 
-- Uses buffer system for navigation, making it feel like a natural part of the editor
-- Shows hidden files (toggle with `g.`)
-- Configurable views and sorting
-- Support for preview, split views, and file operations
-- Automatically hides common directories you don't need to see (node_modules, .git, etc.)
+2. Clone the repository:
 
-### 3. Harpoon 2
+```bash
+git clone https://github.com/thenameiswiiwin/nvim.git ~/.config/nvim
+```
 
-**Purpose**: Provides lightning-fast navigation between your most frequently used files in a project.
+3. Start Neovim:
 
-**When to use it**:
+```bash
+nvim
+```
 
-- When working on related files across a project
-- When you find yourself jumping between the same files repeatedly
-- Perfect for feature development where you need to modify multiple files
+4. On first startup, Lazy.nvim will automatically install all plugins.
 
-**Features**:
+5. For LSP servers, open Neovim and run `:Mason` to install language servers.
 
-- Marks files for quick access (up to 5 prioritized in this configuration)
-- Persists marks between Neovim sessions
-- Telescope integration for visual selection from marked files
-- Supports navigation between marks with simple keystrokes
+## Core Features
 
-### 4. Minimal Statusline (Lualine)
+### 1. Fast Navigation
 
-**Purpose**: Provides essential information about your current buffer without being visually distracting.
+- **FZF-Lua**: Ultra-fast fuzzy finding across files, buffers, and code
+- **Oil.nvim**: File explorer that works within Neovim's buffer system
+- **Harpoon**: Quick jumps between your most used files
 
-**When to use it**: Always active, showing you contextual information based on what you're doing.
+### 2. Intelligent Code Assistance
 
-**Features**:
+- **LSP Integration**: Configured for optimal performance with TypeScript, Rust, Go, PHP, Vue, and more
+- **nvim-cmp**: Completion engine with snippet support
+- **GitHub Copilot**: AI-powered code suggestions
 
-- Shows current file path, Git information, and diagnostics
-- Adapts based on the mode you're in (normal, insert, visual)
-- Automatically hides in certain buffers where it's not needed
-- Integrates with plugins to show relevant status information
-- Uses Catppuccin theme for visual consistency
-- Displays LSP progress indicators in real-time
+### 3. Powerful Editing Capabilities
 
-### 5. LSP (Language Server Protocol) Configuration
+- **Treesitter**: Smart syntax highlighting and code navigation
+- **Mini.pairs**: Auto-closing brackets and quotes
+- **Formatting & Linting**: Automatic code formatting and linting on save (configurable)
+- **Flash.nvim**: Enhanced motions and navigation
 
-**Purpose**: Provides intelligent code assistance, including auto-completion, diagnostics, definition jumping, and more.
+### 4. Developer Tools
 
-**When to use it**: Automatically activates when editing supported file types.
+- **DAP**: Debug Adapter Protocol for debugging support
+- **Neotest**: Testing framework integration
+- **Git Integration**: Signs, blame, and operations directly within Neovim
 
-**Features**:
+### 5. Minimal & Efficient UI
 
-- Managed through Mason for easy installation and updates
-- Configured for all your primary languages (JS/TS, PHP, CSS, HTML, Vue, etc.)
-- Format on save with Conform.nvim
-- Linting with nvim-lint
-- Hover documentation
-- Code actions (quick fixes)
-- Navigation to definitions, references, and implementations
-- Rename symbols across files
-- Signature help when writing function calls
-- Inlay Hints: Shows type information and parameter names directly in your code
-- LSP Progress Indicator: Displays real-time feedback on LSP operations in your statusline
-- Enhanced TypeScript Support: Specialized tools for TypeScript with deeper language understanding
+- **Lualine**: Lightweight status line with essential information
+- **Rose Pine**: Beautiful, optimized color scheme
+- **Zen Mode**: Distraction-free coding
 
-### 6. GitHub Copilot Integration
+## Performance Optimizations
 
-**Purpose**: AI-powered code completion that suggests entire lines or blocks of code as you type.
+This configuration includes numerous performance optimizations:
 
-**When to use it**: When writing new code or implementations where you could benefit from AI assistance.
+- **Plugin Lazy Loading**: Most plugins only load when actually needed
+- **LSP Performance Tuning**: Reduced diagnostics frequency, optimized inlay hints, cached operations
+- **Large File Handling**: Automatically disables heavy features for large files
+- **FZF Optimization**: Configured for maximum speed with smart caching
+- **Memory Management**: Reduced treesitter parser load, optimized completion engine
+- **Throttled Operations**: Linting, formatting, and other intensive operations are throttled
+- **Efficient UI**: Minimal status line, optimized highlighting
+- **File Watchers**: Limited and optimized to reduce disk operations
 
-**Features**:
+## Plugin Details
 
-- Auto-triggering with configurable keyboard shortcuts
-- Accept line suggestions with `<C-CR>` (Ctrl+Enter)
-- Accept word suggestions with `<M-k>` (Alt+k)
-- Accept full suggestions with `<M-l>` (Alt+l)
-- Works alongside traditional LSP completions
-- Suggestions panel with `<M-CR>` (Alt+Enter)
-- Ghost Text Preview: Shows completions directly in your code before accepting them
+### User Interface
 
-### 7. Testing Framework (Neotest)
+#### Rose Pine Theme
 
-**Purpose**: Run and debug tests directly from your editor.
+A modern low-contrast theme for better focus and reduced eye strain.
 
-**When to use it**:
+#### Lualine
 
-- When writing tests for your code
-- When debugging failing tests
-- During test-driven development
+Minimal status line showing essential information like mode, file, git status, and diagnostics.
 
-**Features**:
+#### Mini.icons
 
-- Support for multiple test frameworks (Jest, Vitest, PHPUnit, Playwright, etc.)
-- Run individual tests or entire test suites
-- Debug tests with DAP integration
-- View test output in a floating window
-- Jump between test failures
+Provides icons for files and filetypes with minimal overhead.
 
-### 8. Git Integration
+#### Which-key
 
-**Purpose**: Manage Git operations without leaving your editor.
+Shows available keybindings in a popup - only loaded when needed.
 
-**When to use it**:
+#### Zen Mode
 
-- When tracking changes in your code
-- When staging, committing, or resolving conflicts
-- When reviewing changes before committing
+Toggle distraction-free coding mode with `<leader>zz` or `<leader>zZ`.
 
-**Features**:
+### Navigation
 
-- Git signs in the gutter showing line changes
-- Blame information
-- Interactive staging and unstaging
-- Commit creation
-- Conflict resolution helpers
-- LazyGit integration for a full-featured Git UI
+#### FZF-Lua
 
-### 9. Zen Mode
+Ultra-fast fuzzy finder with optimized performance:
 
-**Purpose**: Reduces visual distractions to help you focus on your code.
+- `<leader>ff`: Find files
+- `<leader>fg`: Live grep
+- `<leader>fb`: Browse buffers
+- `<leader>fr`: Recent files
 
-**When to use it**:
+#### Oil.nvim
 
-- When you need deep focus
-- When working on complex code that requires concentration
-- When writing documentation or longer text sections
+File explorer that works within Neovim's buffer system:
 
-**Features**:
+- `<leader>e`: Open Oil explorer
+- `-`: Navigate up to parent directory
+- `<CR>`: Open selected file or directory
 
-- Two modes: standard (with line numbers) and full focus
-- Centers your code on the screen
-- Hides UI elements you don't need while focusing
-- Keybindings to toggle between normal and Zen modes
+#### Harpoon
 
-### 10. Indentation Guides
+Quick navigation between marked files:
 
-**Purpose**: Visual indicators that help you see code structure and nesting levels.
+- `<leader>ha`: Add current file to Harpoon
+- `<leader>hm`: Show Harpoon menu
+- `<leader>1-5`: Jump to marked files
+- `<leader>hn/hp`: Navigate between marked files
 
-**When to use it**: Always active when editing code, particularly useful for deeply nested structures.
+#### Flash.nvim
 
-**Features**:
+Enhanced motions for faster navigation:
 
-- Rainbow colors to distinguish different nesting levels
-- Animated scope indication when moving between blocks
-- Works well with all supported languages
-- Subtle indicators that don't distract from the code
+- `s`: Start Flash jump
+- `S`: Flash Treesitter navigation
 
-### 11. Telescope Fuzzy Finder
+### Editing and Coding
 
-**Purpose**: Powerful search and selection interface for files, text, and more.
+#### nvim-cmp
 
-**When to use it**:
+Completion engine with multiple sources:
 
-- When looking for files by name
-- When searching for text across your project
-- When selecting from lists (buffers, Git branches, etc.)
-
-**Features**:
-
-- Fast fuzzy finding with FZF integration
-- File navigation
-- Live grep for text search
-- Preview capabilities
-- Integration with LSP (symbols, references, etc.)
-- Git integration for branches, commits, and status
-
-### 12. Treesitter
-
-**Purpose**: Advanced syntax highlighting and code navigation based on an understanding of language structure.
-
-**When to use it**: Automatically active for all supported languages.
-
-**Features**:
-
-- Smarter syntax highlighting
-- Code folding based on language structure
-- Text objects for structural navigation
-- Incremental selection based on syntax nodes
-- Language-aware indentation
-- Support for all your primary languages
-- Smart Code Folding: Intelligent code folding based on language structure
-- Rainbow Delimiters: Color-coded matching brackets and braces for easier visualization
-- Advanced Refactoring: Enhanced tools for renaming, navigation, and code transformation
-- Treesitter Playground: Debugging tool for examining syntax tree and language queries
-
-### 13. Completion System (nvim-cmp)
-
-**Purpose**: Intelligent code completion from multiple sources.
-
-**When to use it**: Automatically triggered while typing or manually activated.
-
-**Features**:
-
-- LSP-based completions
-- Snippet integration
-- Copilot integration
-- Path completions
+- LSP completions
+- Snippet completions
+- Copilot suggestions
 - Buffer text completions
-- Customizable sorting and filtering
-- Icons and documentation display
-- Additional Completion Sources: Emoji, calculations, and Neovim Lua API
-- Ghost Text Preview: Shows completions directly in the editor before accepting
+- Path completions
 
-### 14. Debug Adapter Protocol (DAP)
+#### LuaSnip
 
-**Purpose**: Provides debugging capabilities directly in your editor.
+Snippet engine with VS Code snippet support.
 
-**When to use it**:
+#### Mini.pairs
 
-- When debugging applications
-- When you need to set breakpoints and step through code
-- When inspecting variables during execution
+Automatic bracket and quote pairing.
 
-**Features**:
+#### Conform.nvim
 
-- Integration with multiple debugging protocols
-- Breakpoint management
-- Variable inspection
-- Step-by-step execution
-- Call stack examination
-- UI for debug state
+Code formatting engine:
 
-## Detailed Keymap Explanations
+- Automatic formatting on save (toggleable)
+- Format with `<leader>cf`
+- Toggle with `:FormatToggle`
 
-### Navigation and General Usage
+#### nvim-lint
 
-#### File Navigation
+Linting framework:
 
-- `<leader>pv` (Open Oil explorer): Opens the parent directory in Oil file explorer. Use this when you need to browse files in your project directory, create new files, or manipulate the file system.
+- Automatic linting on save
+- Manual linting with `<leader>cl`
 
-- `<leader>ff` (Find files): Opens Telescope file finder. Use this when you know the name (or part of the name) of a file you want to open, especially in large projects with many files.
+#### Treesitter
 
-- `<leader>fg` (Live grep): Searches for text across your entire project. Use this when you need to find all occurrences of a particular string, function name, or variable across your codebase.
+Smart syntax highlighting and code navigation:
 
-- `<leader>fb` (Buffers): Shows all open buffers for quick switching. Use this to navigate between files you've already opened in your current session.
+- Enhanced syntax highlighting
+- Structural navigation
+- Text objects based on code structure
 
-- `<C-d>` / `<C-u>` (Scroll half-page down/up): Navigates vertically within a file while keeping your cursor centered. Use these for quickly scanning through longer files without losing context.
+### Git Integration
 
-#### Harpoon Navigation
+#### Gitsigns.nvim
 
-- `<leader>ha` (Add file to Harpoon): Marks the current file for quick access later. Use this when you're working on a file that you know you'll need to return to frequently.
+Git integration in the sign column:
 
-- `<leader>hm` (Harpoon menu): Opens a menu showing all marked files. Use this when you want to see a list of all your marked files and choose one to open.
+- `]g/[g`: Navigate between hunks
+- `<leader>ghs`: Stage hunk
+- `<leader>ghr`: Reset hunk
+- `<leader>ghb`: Show blame for current line
 
-- `<leader>1-5` (Jump to Harpoon files): Instantly jumps to the corresponding marked file. Use these shortcuts when you know exactly which marked file you want to open (1st, 2nd, etc.).
+### LSP (Language Server Protocol)
 
-- `<leader>hn` / `<leader>hp` (Next/previous Harpoon file): Cycles through your marked files. Use these when you're iterating through your set of important files.
+#### nvim-lspconfig
 
-#### Split Management
+Core LSP client configuration:
 
-- `<C-h/j/k/l>` (Navigate splits): Moves between split panes without using the mouse. Use these when working with multiple files side by side.
+- `gd`: Go to definition
+- `K`: Show hover information
+- `<leader>ca`: Code actions
+- `<leader>cr`: Rename symbol
+- `<leader>cf`: Find references
+- `<leader>th`: Toggle inlay hints
 
-### Code Editing and Manipulation
+#### mason.nvim
 
-#### Selection and Movement
+LSP server installer:
 
-- `J` / `K` in visual mode: Moves selected lines down/up. Use these when rearranging blocks of code or reorganizing lines.
+- `:Mason`: Open Mason UI
+- Automatic installation of required language servers
 
-- `J` in normal mode: Joins the current line with the line below while preserving cursor position. Use this when combining lines or reformatting code.
+### Language Support
 
-- `n` / `N`: Navigates search results while keeping them centered. Use these after performing a search to keep context while moving through matches.
+This configuration includes optimized support for:
 
-#### Clipboard Operations
+- **TypeScript/JavaScript**: Using vtsls for better performance
+- **Rust**: With rust-analyzer and crates.nvim
+- **Go**: With gopls and dap-go
+- **PHP**: With intelephense
+- **Vue**: With volar
+- **Web**: HTML, CSS, Tailwind
+- **JSON**: With schema support
 
-- `<leader>y` / `<leader>Y`: Yanks (copies) text to system clipboard. Use these when you need to copy code for pasting outside of Neovim.
+### Testing and Debugging
 
-- `<leader>p` in visual mode: Pastes text without losing register contents. Use this when you want to replace selected text without overwriting what's in your paste buffer.
+#### Neotest
 
-- `<leader>d`: Deletes text without yanking. Use this when you want to delete text without affecting your clipboard/registers.
+Testing framework integration:
 
-#### Text Manipulation
+- `<leader>tt`: Run nearest test
+- `<leader>tf`: Run test file
+- `<leader>ts`: Run test suite
+- `<leader>td`: Debug nearest test
 
-- `<leader>s`: Quick search and replace for the word under cursor. Use this for refactoring variable names or changing specific terms throughout a file.
+#### nvim-dap
 
-- `<leader>x`: Makes the current file executable. Use this for shell scripts or other executable files that need the execute permission.
+Debug Adapter Protocol client:
 
-- `<leader>ee`: Inserts error handling snippet for Go. Use this when writing Go code that returns errors.
+- `<leader>db`: Toggle breakpoint
+- `<leader>dc`: Start/continue debugging
+- `<leader>di`: Step into
+- `<leader>do`: Step out
+- `<leader>dO`: Step over
 
-- `<leader>el`: Inserts error logging snippet. Use this when you need to add error logging to your code.
+### AI Assistance
 
-### Quickfix Navigation
+#### GitHub Copilot
 
-- `<leader>qn` / `<leader>qp`: Navigate to next/previous item in the quickfix list. Use these to move through compilation errors, search results, or other items in the quickfix list.
+AI-powered code completion and suggestions:
+
+- Automatic suggestions as you type
+- `<C-y>`: Accept suggestion
+- `<M-k>`: Accept word
+- `<M-l>`: Accept line
+- `<M-CR>`: Open suggestions panel
+
+## Key Mappings
+
+### General Keymaps
+
+| Mapping            | Description                             |
+| ------------------ | --------------------------------------- |
+| `<Space>`          | Leader key                              |
+| `<leader><leader>` | Reload current file                     |
+| `<C-s>`            | Save file                               |
+| `<leader>ut`       | Toggle between dark/light theme         |
+| `<leader>zz`       | Toggle Zen Mode (with line numbers)     |
+| `<leader>zZ`       | Toggle Zen Mode (full distraction-free) |
+
+### File Navigation Keymaps
+
+| Mapping         | Description                    |
+| --------------- | ------------------------------ |
+| `<leader>e`     | Open Oil file explorer         |
+| `<leader>ff`    | Find files with FZF            |
+| `<leader>fg`    | Live grep with FZF             |
+| `<leader>fb`    | Browse buffers                 |
+| `<leader>fr`    | Browse recent files            |
+| `<leader>ha`    | Add file to Harpoon            |
+| `<leader>hm`    | Open Harpoon menu              |
+| `<leader>1-5`   | Jump to Harpoon files 1-5      |
+| `<leader>hn/hp` | Navigate between Harpoon files |
+| `<C-h/j/k/l>`   | Navigate between splits        |
+
+### Editing Keymaps
+
+| Mapping        | Description                          |
+| -------------- | ------------------------------------ |
+| `J/K` (visual) | Move selected lines down/up          |
+| `J` (normal)   | Join lines keeping cursor position   |
+| `<leader>p`    | Paste without yanking                |
+| `<leader>y`    | Yank to system clipboard             |
+| `<leader>d`    | Delete without yanking               |
+| `<leader>sr`   | Search and replace word under cursor |
+| `<leader>cf`   | Format document                      |
+| `<leader>cl`   | Lint current file                    |
+| `<leader>cx`   | Make file executable                 |
+
+### LSP and Code Actions Keymaps
+
+| Mapping      | Description              |
+| ------------ | ------------------------ |
+| `gd`         | Go to definition         |
+| `K`          | Show hover information   |
+| `<leader>ca` | Code actions             |
+| `<leader>cr` | Rename symbol            |
+| `<leader>cf` | Find references          |
+| `<leader>th` | Toggle inlay hints       |
+| `[d/]d`      | Previous/next diagnostic |
+| `<leader>xd` | Show diagnostic details  |
+| `<leader>cm` | Open Mason               |
+
+### Git Operations Keymaps
+
+| Mapping       | Description        |
+| ------------- | ------------------ |
+| `[g/]g`       | Previous/next hunk |
+| `<leader>ghs` | Stage hunk         |
+| `<leader>ghr` | Reset hunk         |
+| `<leader>ghb` | Blame line         |
+| `<leader>ghp` | Preview hunk       |
+| `<leader>gs`  | Git status         |
+| `<leader>gc`  | Git commits        |
+| `<leader>gb`  | Git branches       |
 
-- `<leader>k` / `<leader>j`: Navigate to next/previous item in the location list. Use these for localized lists of diagnostics or search results.
+### Testing Keymaps
 
-### LSP Features
+| Mapping      | Description                       |
+| ------------ | --------------------------------- |
+| `<leader>tt` | Run nearest test                  |
+| `<leader>tf` | Run file tests                    |
+| `<leader>ts` | Run test suite                    |
+| `<leader>td` | Debug nearest test                |
+| `<leader>to` | Show test output                  |
+| `<leader>tp` | Toggle output panel               |
+| `<leader>tm` | Toggle test summary               |
+| `[t/]t`      | Jump to previous/next failed test |
 
-#### Code Navigation
+### Debugging Keymaps
 
-- `gd` (Go to definition): Jumps to where a symbol is defined. Use this when you need to understand how a function, variable, or type is implemented.
+| Mapping      | Description                |
+| ------------ | -------------------------- |
+| `<leader>db` | Toggle breakpoint          |
+| `<leader>dB` | Set conditional breakpoint |
+| `<leader>dc` | Start/continue debugging   |
+| `<leader>dC` | Run to cursor              |
+| `<leader>di` | Step into                  |
+| `<leader>do` | Step out                   |
+| `<leader>dO` | Step over                  |
+| `<leader>dt` | Terminate debug session    |
+| `<leader>du` | Toggle DAP UI              |
+| `<leader>de` | Evaluate expression        |
 
-- `<leader>rf` (Find references): Shows all places where a symbol is used. Use this when refactoring to see all the places you need to update.
+## Language Server Setup
 
-- `K` (Hover information): Shows documentation for the symbol under cursor. Use this to quickly check function signatures, type information, or documentation without leaving your current position.
+This configuration includes optimized LSP setups for multiple languages:
 
-- `<leader>th` (Toggle inlay hints): Toggles type hints and parameter names inline in your code. Use this when you want additional context about types without hovering.
+### TypeScript/JavaScript
 
-#### Code Actions
+- Using vtsls for better performance
+- Intelligent inlay hints and completion
+- Path imports and refactoring support
 
-- `<leader>ca` (Code actions): Shows available actions for fixing or modifying code. Use this when you see an error or warning and want to see automatic fix options.
+### Rust
 
-- `<leader>rn` (Rename): Renames a symbol across your project. Use this for refactoring variable, function, or class names.
+- Full rust-analyzer integration
+- crates.nvim for Cargo.toml management
+- Auto-loading of clippy lints
 
-- `<leader>vd` (View diagnostic): Shows detailed information about the current diagnostic. Use this when you need more context about an error or warning.
+### Go
 
-#### Diagnostics Navigation
+- Optimized gopls configuration
+- Testing tools integration
+- Debug adapter for delve
 
-- `[d` / `]d`: Navigate to previous/next diagnostic in the file. Use these to quickly move between errors and warnings in your code.
+### PHP
 
-- `<leader>dd`: Opens floating window with diagnostic details. Use this when you need to see the full text of a diagnostic message.
+- Intelephense for intelligent completion
+- PHPUnit test integration
+- Performance-optimized stubs
 
-### Git Operations
+### Vue
 
-#### Fugitive Commands (Prefix: `<leader>gf`)
+- Volar in hybrid mode for optimal performance
+- TypeScript integration
+- Vitest testing
 
-- `<leader>gfs` (Fugitive: Git status): Opens Fugitive for Git status view. Use this to see all changes in your repository and stage/unstage files.
+### Web Development
 
-- `<leader>gfc` (Fugitive: Git commit): Initiates a commit through Fugitive. Use this when you're ready to commit your staged changes.
+- HTML/CSS/SCSS language servers
+- Tailwind CSS integration
+- JSON with schema validation
 
-- `<leader>gfp` (Fugitive: Git push): Pushes your changes to the remote repository. Use this after committing to share your changes.
+## Customization
 
-- `<leader>gfl` (Fugitive: Git pull): Pulls changes from the remote repository with rebase. Use this to keep your local repository up to date.
+This configuration is designed to be easily customizable:
 
-- `<leader>gfb` (Fugitive: Git blame): Shows blame information for the current file. Use this to see who last modified each line of code.
+### Adding New Plugins
 
-#### LazyGit
+1. Edit the appropriate file in `lua/thenameiswiiwin/plugins/` directory
+2. Follow the Lazy.nvim format for adding plugins
+3. Run `:Lazy sync` to install
 
-- `<leader>gg` (LazyGit): Opens the LazyGit interface. Use this for a comprehensive Git UI when performing complex Git operations.
+### Changing Keymaps
 
-#### Gitsigns Navigation and Actions
+Modify `lua/thenameiswiiwin/core/keymaps.lua` to add or change key mappings.
 
-- `]g` / `[g`: Navigate to next/previous Git hunk (changed section). Use these to review changes in your code.
+### Language Server Configuration
 
-- `<leader>hs` / `<leader>hr`: Stage/reset Git hunk. Use these to selectively stage or unstage changes within a file.
+Modify language-specific settings in the `lua/thenameiswiiwin/plugins/lang/` directory.
 
-- `<leader>hb`: Show blame information for current line. Use this to see who last changed a particular line of code and in which commit.
+### Performance Tuning
 
-### Testing
+If you need to further optimize for performance:
 
-- `<leader>tt` (Test nearest): Runs the test closest to your cursor. Use this during test-driven development to quickly verify a specific test.
+- Disable unused language servers in the language configuration files
+- Modify treesitter parsers to only include languages you use
+- Adjust the large file thresholds in `lua/thenameiswiiwin/core/autocmds.lua`
 
-- `<leader>tf` (Test file): Runs all tests in the current file. Use this when you've made changes that affect multiple tests in the same file.
+## Troubleshooting
 
-- `<leader>ts` (Test suite): Runs the entire test suite. Use this before committing to ensure all tests pass.
+### Common Issues
 
-- `<leader>td` (Debug test): Runs the nearest test with the debugger attached. Use this when a test is failing and you need to step through it to understand why.
+#### Slow startup time
 
-- `<leader>to` (Test output): Shows the output of the last test run. Use this to see detailed test results, especially for failing tests.
+- Check which plugins are loading at startup with `:Lazy profile`
+- Consider lazy-loading more plugins
 
-### Debugging
+#### LSP not working for a language
 
-- `<leader>dc` (Debug continue): Starts or continues debugging. Use this to begin a debugging session or to continue execution after stopping.
+- Run `:Mason` and check if the language server is installed
+- Check the language server logs with `:LspLog`
 
-- `<leader>db` (Debug breakpoint): Toggles a breakpoint at the current line. Use this to mark where you want execution to pause during debugging.
+#### Completion not showing
 
-- `<leader>dB` (Conditional breakpoint): Sets a conditional breakpoint. Use this when you only want to pause execution when certain conditions are met.
+- Make sure the LSP server is running (`:LspInfo`)
+- Check if the completion source is available (`:lua require('cmp').setup.info()`)
 
-- `<leader>dn` / `<leader>di` / `<leader>do`: Step over/into/out during debugging. Use these to control execution flow while debugging.
+#### Large file performance
 
-- `<leader>du` (Debug UI): Toggles the debugging UI. Use this to see variables, call stack, and other debug information.
+- The configuration automatically disables heavy features for files > 1MB
+- You can adjust this threshold in the autocmds.lua file
 
-### Focus and Distraction Management
+### Getting Help
 
-- `<leader>zz` (Zen mode with line numbers): Toggles a focused mode that hides UI elements but keeps line numbers. Use this when you want to concentrate but still need line references.
-
-- `<leader>zZ` (Full Zen mode): Toggles a completely distraction-free mode. Use this when you need maximum focus and don't need line numbers.
-
-### Treesitter Text Object and Navigation
-
-- `<leader>ws` / `<leader>wS`: Swap next/previous parameter. Use these to quickly reorganize function parameters.
-
-- `<leader>wf` / `<leader>wF`: Swap next/previous function. Use these to rearrange function declarations.
-
-- `<leader>wm` / `<leader>wM`: Swap next/previous method call. Use these to reorganize method chains.
-
-- `<leader>tr` (Smart rename): Performs a treesitter-aware rename of the symbol under cursor, respecting the language semantics. Use this for more accurate renaming.
-
-- `gnd` (Go to definition): Uses treesitter to jump to the definition of a symbol. Useful when LSP is not available.
-
-- `gnD` (List definitions): Shows all definitions of the current symbol in the project.
-
-- `gO` (List definitions TOC): Displays a table of contents of all definitions in the current file.
-
-- `<a-*>` / `<a-#>` (Next/previous usage): Navigates between usages of the current symbol. Useful for reviewing how a function or variable is used.
-
-### Folding
-
-- `zR` (Open all folds): Expands all code folds in the current buffer. Use this to see the entire file.
-
-- `zM` (Close all folds): Collapses all code sections. Use this for getting an overview of the file structure.
-
-- `zr` (Open folds except kinds): Selectively opens folds. Useful when you want to focus on specific types of code blocks.
-
-### Additional Utilities
-
-- `<leader>u` (Undotree): Opens the undo history visualizer. Use this when you need to navigate through complex edit history.
-
-- `<leader><leader>` (Source): Reloads the current file. Use this after making changes to your Neovim configuration to apply them without restarting.
-
-- `<C-s>` (Save): Quickly saves the current file. Use this periodically to save your work.
-
-- `<leader>xx` (Trouble document diagnostics): Opens the Trouble panel with current file diagnostics. Use this to get an overview of all issues in your file.
-
-- `<leader>xX` (Trouble workspace diagnostics): Opens the Trouble panel with project-wide diagnostics. Use this to see all issues across your project.
-
-- `<leader>ts` (Toggle TS Playground): Opens the Treesitter Playground for debugging syntax trees and queries.
-
-## Advanced Usage Scenarios
-
-### Web Development Workflow
-
-1. Start by opening your project with `nvim` in the terminal
-2. Use `<leader>pv` to browse files or `<leader>ff` to find specific files
-3. Mark important files (e.g., component, styles, tests) with Harpoon (`<leader>ha`)
-4. When coding, use LSP features for auto-completion and diagnostics
-5. Use `<leader>s` for quick refactoring of variable or function names
-6. Run tests with `<leader>tt` or `<leader>tf` to verify changes
-7. Use Git integration (`<leader>gg` or `<leader>gfs`) to stage and commit changes
-8. Navigate back to other files using Harpoon shortcuts (`<leader>1-5`)
-
-### TypeScript Development with Enhanced Features
-
-1. Navigate to your TypeScript project
-2. Use `<leader>ff` to find a specific file
-3. While coding, notice inlay hints showing parameter names and return types
-4. Use `<leader>th` to toggle these hints if they become distracting
-5. When refactoring, use `<leader>tr` for smart renaming across the codebase
-6. Navigate between usages with `<a-*>` and `<a-#>`
-7. Use the ghost text preview for faster completion with Copilot
-8. When facing complex nested code, rely on rainbow delimiters to visually match brackets
-9. For a cleaner view, use `zM` to collapse all functions and `zR` to expand again
-
-### Debugging Workflow
-
-1. Set breakpoints in your code with `<leader>db`
-2. Start debugging with `<leader>dc`
-3. Step through code with `<leader>dn`, `<leader>di`, and `<leader>do`
-4. Inspect variables and state in the debug UI (`<leader>du`)
-5. Continue execution with `<leader>dc` until the next breakpoint
-6. Fix issues and save with `<C-s>`
-7. Restart debugging session to verify fixes
-
-### Documentation Writing
-
-1. Open the file you want to document
-2. Enter Zen mode with `<leader>zZ` for distraction-free writing
-3. Use LSP features for code snippets and documentation standards
-4. When done, exit Zen mode and save your changes
-5. Run tests if available to ensure documentation examples work
-
-### Pair Programming
-
-1. Use clear file navigation with Telescope and Oil to show your partner the codebase
-2. Use `K` to show documentation and context for unfamiliar code
-3. Use Git blame with `<leader>hb` to understand code history
-4. Run tests together to verify changes
-5. Use the minimal UI to maximize code visibility on shared screens
-
-By understanding these features and keymaps, you'll be able to create an efficient and productive development workflow that leverages the full power of your Neovim configuration.
+- Check `:help` for Neovim documentation
+- Look at plugin documentation in their respective GitHub repositories
+- Check the Neovim subreddit or Discord for community help

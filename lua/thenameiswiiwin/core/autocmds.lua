@@ -102,6 +102,27 @@ autocmd("BufEnter", {
   end,
 })
 
+-- Automatic buffer cleanup
+autocmd("BufEnter", {
+  callback = function()
+    -- Auto close unmodified buffers after opening too many
+    if #vim.fn.getbufinfo({ buflisted = 1 }) > 30 then
+      local buffers_to_keep = {}
+      -- Keep current and visible buffers
+      for _, win in ipairs(vim.api.nvim_list_wins()) do
+        buffers_to_keep[vim.api.nvim_win_get_buf(win)] = true
+      end
+      -- Close others if unmodified
+      for _, buf in ipairs(vim.fn.getbufinfo({ buflisted = 1 })) do
+        if not buffers_to_keep[buf.bufnr] and buf.changed == 0 then
+          vim.api.nvim_buf_delete(buf.bufnr, { force = false })
+        end
+      end
+    end
+  end,
+  group = augroup("buffer_cleanup", { clear = true }),
+})
+
 -- Close some filetypes with just 'q'
 autocmd("FileType", {
   pattern = {
@@ -129,4 +150,43 @@ autocmd("FileType", {
 autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
   group = augroup("checktime", {}),
   command = "checktime",
+})
+
+-- Limit treesitter for large files
+autocmd("BufReadPre", {
+  group = augroup("LargeFileOptimization", {}),
+  callback = function(args)
+    local max_filesize = 1024 * 1024 -- 1 MB
+    local ok, stats =
+      pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(args.buf))
+
+    if ok and stats and stats.size > max_filesize then
+      -- Disable treesitter for large files
+      vim.cmd("TSBufDisable highlight")
+
+      -- Set manual folding instead of treesitter for large files
+      vim.opt_local.foldmethod = "manual"
+      vim.opt_local.foldexpr = "0"
+
+      -- Disable syntax highlighting for extremely large files
+      if stats.size > max_filesize * 2 then
+        vim.cmd("syntax off")
+      end
+    end
+  end,
+})
+
+-- Disable automatic completion for large files
+autocmd("BufReadPre", {
+  group = augroup("DisableCompletionLargeFiles", {}),
+  callback = function(args)
+    local max_filesize = 1024 * 1024 -- 1 MB
+    local ok, stats =
+      pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(args.buf))
+
+    if ok and stats and stats.size > max_filesize then
+      -- Disable nvim-cmp
+      require("cmp").setup.buffer({ enabled = false })
+    end
+  end,
 })

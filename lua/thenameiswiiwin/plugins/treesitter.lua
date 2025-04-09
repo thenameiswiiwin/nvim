@@ -23,19 +23,12 @@ return {
           "tsx",
           "html",
           "css",
-          "scss",
           "json",
-          "json5",
-          "jsonc",
           "vue",
-          "svelte",
 
           -- Languages
           "lua",
           "go",
-          "gomod",
-          "gowork",
-          "gosum",
           "php",
           "python",
           "rust",
@@ -43,16 +36,13 @@ return {
 
           -- Markup and config
           "markdown",
-          "markdown_inline",
           "yaml",
           "toml",
 
           -- Git related
           "git_config",
           "gitcommit",
-          "git_rebase",
           "gitignore",
-          "gitattributes",
 
           -- Other utilities
           "regex",
@@ -65,7 +55,7 @@ return {
         sync_install = false,
 
         -- Automatically install missing parsers when entering buffer
-        auto_install = true,
+        auto_install = false, -- Disable for better startup performance
 
         -- List of parsers to ignore installing
         ignore_install = {},
@@ -89,6 +79,7 @@ return {
 
         indent = {
           enable = true,
+          disable = { "yaml" }, -- Disable for problematic files
         },
 
         -- Incremental selection based on the named nodes from the grammar
@@ -121,11 +112,6 @@ return {
               ["il"] = "@loop.inner",
               ["ab"] = "@block.outer",
               ["ib"] = "@block.inner",
-              ["as"] = "@statement.outer",
-              ["is"] = "@statement.inner",
-              ["am"] = "@call.outer",
-              ["im"] = "@call.inner",
-              ["ad"] = "@comment.outer",
             },
           },
           move = {
@@ -136,41 +122,33 @@ return {
               ["]c"] = "@class.outer",
               ["]b"] = "@block.outer",
               ["]a"] = "@parameter.outer",
-              ["]m"] = "@call.outer",
             },
             goto_next_end = {
               ["]F"] = "@function.outer",
               ["]C"] = "@class.outer",
               ["]B"] = "@block.outer",
               ["]A"] = "@parameter.outer",
-              ["]M"] = "@call.outer",
             },
             goto_previous_start = {
               ["[f"] = "@function.outer",
               ["[c"] = "@class.outer",
               ["[b"] = "@block.outer",
               ["[a"] = "@parameter.outer",
-              ["[m"] = "@call.outer",
             },
             goto_previous_end = {
               ["[F"] = "@function.outer",
               ["[C"] = "@class.outer",
               ["[B"] = "@block.outer",
               ["[A"] = "@parameter.outer",
-              ["[M"] = "@call.outer",
             },
           },
           swap = {
             enable = true,
             swap_next = {
               ["<leader>cs"] = "@parameter.inner",
-              ["<leader>cf"] = "@function.outer",
-              ["<leader>cm"] = "@call.outer",
             },
             swap_previous = {
               ["<leader>cS"] = "@parameter.inner",
-              ["<leader>cF"] = "@function.outer",
-              ["<leader>cM"] = "@call.outer",
             },
           },
         },

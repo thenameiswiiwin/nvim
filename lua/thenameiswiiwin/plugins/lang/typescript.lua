@@ -42,11 +42,12 @@ return {
                 completeFunctionCalls = true,
               },
               inlayHints = {
-                enumMemberValues = { enabled = true },
+                -- Limit inlay hints for better performance
+                enumMemberValues = { enabled = false },
                 functionLikeReturnTypes = { enabled = true },
                 parameterNames = { enabled = "literals" },
-                parameterTypes = { enabled = true },
-                propertyDeclarationTypes = { enabled = true },
+                parameterTypes = { enabled = false },
+                propertyDeclarationTypes = { enabled = false },
                 variableTypes = { enabled = false },
               },
             },

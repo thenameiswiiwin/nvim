@@ -39,39 +39,11 @@ return {
         desc = "Run to Cursor",
       },
       {
-        "<leader>dg",
-        function()
-          require("dap").goto_()
-        end,
-        desc = "Go to Line (no execute)",
-      },
-      {
         "<leader>di",
         function()
           require("dap").step_into()
         end,
         desc = "Step Into",
-      },
-      {
-        "<leader>dj",
-        function()
-          require("dap").down()
-        end,
-        desc = "Down",
-      },
-      {
-        "<leader>dk",
-        function()
-          require("dap").up()
-        end,
-        desc = "Up",
-      },
-      {
-        "<leader>dl",
-        function()
-          require("dap").run_last()
-        end,
-        desc = "Run Last",
       },
       {
         "<leader>do",
@@ -95,32 +67,11 @@ return {
         desc = "Pause",
       },
       {
-        "<leader>dr",
-        function()
-          require("dap").repl.toggle()
-        end,
-        desc = "Toggle REPL",
-      },
-      {
-        "<leader>ds",
-        function()
-          require("dap").session()
-        end,
-        desc = "Session",
-      },
-      {
         "<leader>dt",
         function()
           require("dap").terminate()
         end,
         desc = "Terminate",
-      },
-      {
-        "<leader>dw",
-        function()
-          require("dap.ui.widgets").hover()
-        end,
-        desc = "Widgets",
       },
     },
     config = function()
@@ -167,7 +118,7 @@ return {
 
       dap.configurations.typescript = dap.configurations.javascript
 
-      -- Create UI with performance improvements
+      -- Minimal UI with performance improvements
       dapui.setup({
         icons = { expanded = "▾", collapsed = "▸", current_frame = "▸" },
         mappings = {
@@ -207,12 +158,13 @@ return {
           },
         },
         render = {
+          indent = 1,
           max_value_lines = 100, -- Maximum number of lines for a value
           max_type_length = 100, -- Maximum length of variable types
         },
       })
 
-      -- Virtual text integration
+      -- Virtual text integration with performance optimization
       require("nvim-dap-virtual-text").setup({
         enabled = true,
         enabled_commands = true,

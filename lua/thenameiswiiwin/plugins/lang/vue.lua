@@ -18,10 +18,29 @@ return {
         volar = {
           init_options = {
             vue = {
-              hybridMode = true,
+              hybridMode = true, -- Enable hybrid mode for better performance
             },
           },
-          filetypes = { "vue", "typescript", "javascript" },
+          filetypes = { "vue" }, -- Only apply to .vue files for better performance
+          -- Performance optimizations
+          settings = {
+            volar = {
+              completion = {
+                autoImport = true,
+                useScaffoldSnippets = true,
+              },
+              diagnostics = {
+                delay = 200, -- Delay diagnostics for better performance
+              },
+              codeLens = {
+                references = false, -- Disable code lens for better performance
+                pugTools = false,
+              },
+              takeOverMode = {
+                enabled = true, -- Use takeover mode for better performance
+              },
+            },
+          },
         },
       },
     },

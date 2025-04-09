@@ -146,19 +146,6 @@ return {
         )
       end
 
-      -- Only load Playwright adapter when needed
-      if vim.fn.glob("**/playwright.config.*") ~= "" then
-        table.insert(
-          adapters,
-          require("neotest-playwright").adapter({
-            options = {
-              persist_project_selection = true,
-              enable_dynamic_test_discovery = true,
-            },
-          })
-        )
-      end
-
       neotest.setup({
         discovery = {
           enabled = true,
@@ -193,7 +180,7 @@ return {
         },
         output = {
           enabled = true,
-          open_on_run = true,
+          open_on_run = false, -- Don't auto-open output window
         },
         status = {
           enabled = true,
@@ -206,16 +193,11 @@ return {
             height = 40,
           },
         },
-        consumers = {
-          -- Lazy load consumers for better performance
-          overseer = function(_)
-            return require("neotest.consumers.overseer")
-          end,
-        },
         -- Performance optimizations
         running = {
-          concurrent = true,
+          concurrent = true, -- Enable concurrent test runs
         },
+        consumers = {},
       })
     end,
   },

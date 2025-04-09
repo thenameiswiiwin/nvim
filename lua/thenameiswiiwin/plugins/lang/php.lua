@@ -9,7 +9,7 @@ return {
     end,
   },
 
-  -- LSP configuration for PHP (intelephense and phpactor)
+  -- LSP configuration for PHP (intelephense)
   {
     "neovim/nvim-lspconfig",
     opts = {
@@ -17,76 +17,38 @@ return {
         intelephense = {
           settings = {
             intelephense = {
+              -- Limit stubs to essentials for better performance
               stubs = {
                 "apache",
                 "bcmath",
-                "bz2",
-                "calendar",
-                "com_dotnet",
                 "Core",
-                "ctype",
                 "curl",
                 "date",
-                "dba",
                 "dom",
-                "enchant",
-                "exif",
-                "FFI",
-                "fileinfo",
                 "filter",
-                "fpm",
                 "ftp",
-                "gd",
-                "gettext",
-                "gmp",
                 "hash",
                 "iconv",
-                "imap",
-                "intl",
                 "json",
-                "ldap",
                 "libxml",
                 "mbstring",
-                "meta",
                 "mysqli",
-                "oci8",
-                "odbc",
                 "openssl",
-                "pcntl",
                 "pcre",
                 "PDO",
-                "pdo_ibm",
                 "pdo_mysql",
-                "pdo_pgsql",
                 "pdo_sqlite",
-                "pgsql",
                 "Phar",
-                "posix",
-                "pspell",
-                "readline",
-                "Reflection",
+                "reflection",
                 "session",
-                "shmop",
                 "SimpleXML",
-                "snmp",
-                "soap",
-                "sockets",
-                "sodium",
                 "SPL",
-                "sqlite3",
                 "standard",
                 "superglobals",
-                "sysvmsg",
-                "sysvsem",
-                "sysvshm",
-                "tidy",
                 "tokenizer",
                 "xml",
                 "xmlreader",
-                "xmlrpc",
                 "xmlwriter",
-                "xsl",
-                "Zend OPcache",
                 "zip",
                 "zlib",
                 "wordpress",
@@ -94,16 +56,17 @@ return {
                 "laravel",
               },
               files = {
-                maxSize = 5000000,
+                maxSize = 1000000, -- Limit max file size to 1MB for better performance
               },
               environment = {
                 includePaths = { "vendor" },
               },
               diagnostics = {
                 enable = true,
+                run = "onSave", -- Only run on save for better performance
               },
               completion = {
-                maxItems = 100,
+                maxItems = 50, -- Limit completion items for better performance
                 fullyQualifyGlobalConstantsAndFunctions = false,
                 triggerParameterHints = true,
               },
@@ -115,20 +78,10 @@ return {
               },
             },
           },
-        },
-        phpactor = {
-          filetypes = { "php" },
-          -- Only use certain features from phpactor since intelephense is more performant
-          init_options = {
-            index = {
-              enabled = false,
-            },
-            completion = {
-              enabled = false,
-            },
-            diagnostics = {
-              enabled = false,
-            },
+          -- Performance optimizations
+          filetypes = { "php" }, -- Only activate for PHP files
+          flags = {
+            debounce_text_changes = 150, -- Reduce text change frequency
           },
         },
       },
@@ -142,7 +95,7 @@ return {
       opts.ensure_installed = opts.ensure_installed or {}
       vim.list_extend(
         opts.ensure_installed,
-        { "phpcs", "php-cs-fixer", "phpstan" }
+        { "phpcs", "php-cs-fixer", "intelephense" }
       )
     end,
   },

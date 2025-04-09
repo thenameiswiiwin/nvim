@@ -21,10 +21,9 @@ return {
           local wins = vim.api.nvim_tabpage_list_wins(tabpage)
           for _, win in ipairs(wins) do
             local buf = vim.api.nvim_win_get_buf(win)
-            local filetype = vim.api.nvim_buf_get_option(buf, "filetype")
-            local buftype = vim.api.nvim_buf_get_option(buf, "buftype")
+            local filetype = vim.bo[buf].filetype
+            local buftype = vim.bo[buf].buftype
             local bufname = vim.api.nvim_buf_get_name(buf)
-
             -- Skip special buffers
             if
               vim.tbl_contains({ "gitcommit", "help", "qf" }, filetype)
@@ -61,7 +60,6 @@ return {
       },
     },
   },
-
   -- Plenary: Utility functions
   {
     "nvim-lua/plenary.nvim",

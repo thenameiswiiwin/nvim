@@ -295,6 +295,7 @@ vim.keymap.set(
 vim.keymap.set("n", "<leader>zz", function()
   require("zen-mode").toggle({ window = { width = 90 } })
 end, { desc = "Zen Mode (with line numbers)" })
+
 vim.keymap.set("n", "<leader>zZ", function()
   require("zen-mode").toggle({
     window = {

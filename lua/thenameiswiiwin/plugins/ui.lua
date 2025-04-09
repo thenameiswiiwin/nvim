@@ -1,5 +1,5 @@
 return {
-  -- Lualine: Status line
+  -- Lualine: Status line (minimal configuration)
   {
     "nvim-lualine/lualine.nvim",
     event = "VeryLazy",
@@ -50,10 +50,13 @@ return {
             inactive = { c = { fg = colors.muted, bg = colors.base } },
           },
           disabled_filetypes = {
-            statusline = { "dashboard", "alpha", "starter" },
-            winbar = { "dashboard", "alpha", "starter" },
+            statusline = { "dashboard", "alpha", "starter", "oil" },
+            winbar = { "dashboard", "alpha", "starter", "oil" },
           },
           global_status = true,
+          refresh = {
+            statusline = 1000, -- Update less frequently for performance
+          },
         },
         sections = {
           -- These are to remove the defaults
@@ -116,8 +119,6 @@ return {
 
       ins_left({ "location", color = { fg = colors.rose } })
 
-      ins_left({ "progress" })
-
       ins_left({
         "diagnostics",
         sources = { "nvim_diagnostic" },
@@ -127,14 +128,13 @@ return {
           color_warn = { fg = colors.gold },
           color_info = { fg = colors.foam },
         },
+        update_in_insert = false, -- Update diagnostics less frequently for performance
       })
 
-      -- Insert mid section - for Copilot status
+      -- Add simplified component for Copilot status
       ins_left({
         function()
-          local status = vim.api.nvim_get_var("copilot_active") == 1 and ""
-            or ""
-          return status
+          return vim.g.copilot_active == 1 and "" or ""
         end,
         cond = function()
           return vim.g.copilot_active ~= nil
@@ -142,48 +142,16 @@ return {
         color = { fg = colors.gold },
       })
 
-      -- Add component for LSP status
+      -- Add simplified component for LSP status
       ins_right({
         function()
-          local msg = "No LSP"
-          local buf_ft = vim.api.nvim_buf_get_option(0, "filetype")
-          local clients = vim.lsp.get_clients()
-          if next(clients) == nil then
-            return msg
+          local clients = vim.lsp.get_clients({ bufnr = 0 })
+          if #clients == 0 then
+            return ""
           end
-          -- Only show client name for the filetype
-          msg = ""
-          local client_names = {}
-          for _, client in ipairs(clients) do
-            local filetypes = client.config.filetypes
-            if filetypes and vim.fn.index(filetypes, buf_ft) ~= -1 then
-              client_names[client.name] = true
-            end
-          end
-          for name, _ in pairs(client_names) do
-            if msg == "" then
-              msg = name
-            else
-              msg = msg .. ", " .. name
-            end
-          end
-          return msg
+          return "LSP"
         end,
         color = { fg = colors.foam, gui = "bold" },
-      })
-
-      ins_right({
-        "o:encoding", -- option component same as &encoding in viml
-        fmt = string.upper,
-        cond = conditions.hide_in_width,
-        color = { fg = colors.iris },
-      })
-
-      ins_right({
-        "fileformat",
-        fmt = string.upper,
-        icons_enabled = false,
-        color = { fg = colors.iris },
       })
 
       ins_right({
@@ -194,7 +162,6 @@ return {
 
       ins_right({
         "diff",
-        -- Is it me or the symbol for modified is really weird
         symbols = { added = "+ ", modified = "~ ", removed = "- " },
         diff_color = {
           added = { fg = colors.foam },
@@ -284,250 +251,6 @@ return {
           ["svelte"] = { glyph = "", hl = "MiniIconsRed" },
         },
       })
-    end,
-  },
-
-  -- Nui.nvim: UI component library
-  {
-    "MunifTanjim/nui.nvim",
-    lazy = true,
-  },
-
-  -- Noice.nvim: Better UI for messages, cmdline, popupmenu
-  {
-    "folke/noice.nvim",
-    event = "VeryLazy",
-    dependencies = {
-      "MunifTanjim/nui.nvim",
-    },
-    opts = {
-      cmdline = {
-        enabled = true,
-        view = "cmdline",
-        format = {
-          cmdline = { icon = ">" },
-          search_down = { icon = "🔍⌄" },
-          search_up = { icon = "🔍⌃" },
-          filter = { icon = "$" },
-          lua = { icon = "☾" },
-          help = { icon = "?" },
-        },
-      },
-      messages = {
-        enabled = true,
-        view = "notify",
-        view_error = "notify",
-        view_warn = "notify",
-        view_history = "messages",
-        view_search = "virtualtext",
-      },
-      popupmenu = {
-        enabled = true,
-        backend = "nui",
-      },
-      notify = {
-        enabled = true,
-        view = "notify",
-      },
-      lsp = {
-        progress = {
-          enabled = true,
-          format = "lsp_progress",
-          format_done = "lsp_progress_done",
-          view = "mini",
-        },
-        override = {
-          ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-          ["vim.lsp.util.stylize_markdown"] = true,
-          ["cmp.entry.get_documentation"] = true,
-        },
-        hover = {
-          enabled = true,
-          silent = false,
-          view = nil,
-          opts = {},
-        },
-        signature = {
-          enabled = true,
-          auto_open = {
-            enabled = true,
-            trigger = true,
-            luasnip = true,
-            throttle = 50,
-          },
-          view = nil,
-          opts = {},
-        },
-        message = {
-          enabled = true,
-          view = "notify",
-          opts = {},
-        },
-        documentation = {
-          view = "hover",
-          opts = {
-            lang = "markdown",
-            replace = true,
-            render = "plain",
-            format = { "{message}" },
-            win_options = { concealcursor = "n", conceallevel = 3 },
-          },
-        },
-      },
-      smart_move = {
-        enabled = true,
-        excluded_filetypes = { "cmp_menu", "cmp_docs", "notify" },
-      },
-      presets = {
-        bottom_search = true, -- use a classic bottom cmdline for search
-        command_palette = true, -- position the cmdline and popupmenu together
-        long_message_to_split = true, -- long messages will be sent to a split
-        inc_rename = true, -- enables an input dialog for inc-rename.nvim
-        lsp_doc_border = true, -- add a border to hover docs and signature help
-      },
-      views = {
-        mini = {
-          win_options = {
-            winblend = 0,
-          },
-        },
-      },
-      routes = {
-        -- Hide written message
-        {
-          filter = {
-            event = "msg_show",
-            kind = "",
-            find = "written",
-          },
-          opts = { skip = true },
-        },
-        -- Ignore LSP progress messages
-        {
-          filter = {
-            event = "lsp",
-            kind = "progress",
-          },
-          opts = { skip = true },
-        },
-      },
-    },
-  },
-
-  -- Snacks.nvim: Collection of mini utilities
-  {
-    "folke/snacks.nvim",
-    lazy = false, -- Ensure it's not lazy loaded
-    priority = 1000, -- Give it high priority
-    dependencies = {
-      "MunifTanjim/nui.nvim",
-    },
-    config = function()
-      -- Initialize the Snacks global
-      _G.Snacks = require("snacks")
-
-      -- Helper function for terminal navigation
-      local function term_nav(direction)
-        return function()
-          if vim.fn.winnr("$") > 1 then
-            return string.format("<cmd>wincmd %s<cr>", direction)
-          else
-            return ""
-          end
-        end
-      end
-
-      -- Setup snacks with all the requested features
-      Snacks.setup({
-        -- Enable indent guides (replace indent-blankline)
-        indent = { enabled = true },
-
-        -- Input dialogs (replace dressing.nvim)
-        input = { enabled = true },
-
-        -- Enable notification system
-        notifier = { enabled = true },
-
-        -- Current scope visualization
-        scope = { enabled = true },
-
-        -- Smooth scrolling
-        scroll = { enabled = true },
-
-        -- Configurable toggle options
-        toggle = {
-          map = function(mode, lhs, rhs, opts)
-            opts = opts or {}
-            vim.keymap.set(mode, lhs, rhs, opts)
-          end,
-        },
-
-        -- Word highlighting
-        words = { enabled = true },
-
-        -- Large file handling
-        bigfile = { enabled = true },
-
-        -- Quick file access
-        quickfile = { enabled = true },
-
-        -- Terminal improvements
-        terminal = {
-          win = {
-            keys = {
-              nav_h = {
-                "<C-h>",
-                term_nav("h"),
-                desc = "Go to Left Window",
-                expr = true,
-                mode = "t",
-              },
-              nav_j = {
-                "<C-j>",
-                term_nav("j"),
-                desc = "Go to Lower Window",
-                expr = true,
-                mode = "t",
-              },
-              nav_k = {
-                "<C-k>",
-                term_nav("k"),
-                desc = "Go to Upper Window",
-                expr = true,
-                mode = "t",
-              },
-              nav_l = {
-                "<C-l>",
-                term_nav("l"),
-                desc = "Go to Right Window",
-                expr = true,
-                mode = "t",
-              },
-            },
-          },
-        },
-      })
-
-      -- Set up keymaps for snacks features
-      vim.keymap.set("n", "<leader>.", function()
-        Snacks.scratch()
-      end, { desc = "Toggle Scratch Buffer" })
-      vim.keymap.set("n", "<leader>S", function()
-        Snacks.scratch.select()
-      end, { desc = "Select Scratch Buffer" })
-      vim.keymap.set("n", "<leader>dps", function()
-        Snacks.profiler.scratch()
-      end, { desc = "Profiler Scratch Buffer" })
-      vim.keymap.set("n", "<leader>n", function()
-        if Snacks.config.picker and Snacks.config.picker.enabled then
-          Snacks.picker.notifications()
-        else
-          Snacks.notifier.show_history()
-        end
-      end, { desc = "Notification History" })
-      vim.keymap.set("n", "<leader>un", function()
-        Snacks.notifier.hide()
-      end, { desc = "Dismiss All Notifications" })
     end,
   },
 }

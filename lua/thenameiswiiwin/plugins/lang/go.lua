@@ -42,13 +42,6 @@ return {
             mode = "test",
             program = "${file}",
           },
-          {
-            type = "go",
-            name = "Debug Test Package",
-            request = "launch",
-            mode = "test",
-            program = "${fileDirname}",
-          },
         },
         -- Let delve infer the mode
         delve = {
@@ -83,12 +76,12 @@ return {
           cmd = function()
             -- Try Mason's version first
             local mason_registry = require("mason-registry")
-            local mason_path = mason_registry
-              .get_package("gopls")
-              :get_install_path() .. "/gopls"
+            local has_mason, mason_path = pcall(function()
+              return mason_registry.get_package("gopls"):get_install_path() .. "/gopls"
+            end)
 
             -- Check if Mason's gopls exists
-            if vim.fn.executable(mason_path) == 1 then
+            if has_mason and vim.fn.executable(mason_path) == 1 then
               return { mason_path }
             end
 
@@ -136,15 +129,16 @@ return {
           settings = {
             gopls = {
               gofumpt = true,
+              -- Performance optimizations - disable less frequently used features
               codelenses = {
-                gc_details = false,
-                generate = true,
-                regenerate_cgo = true,
-                run_govulncheck = true,
-                test = true,
-                tidy = true,
-                upgrade_dependency = true,
-                vendor = true,
+                gc_details = false,        -- Disable gc details
+                generate = true,           -- Keep generate
+                regenerate_cgo = false,    -- Disable cgo regeneration
+                run_govulncheck = false,   -- Disable govulncheck
+                test = true,               -- Keep test
+                tidy = true,               -- Keep tidy
+                upgrade_dependency = false, -- Disable upgrade_dependency
+                vendor = false,            -- Disable vendor
               },
               hints = {
                 assignVariableTypes = true,
@@ -172,7 +166,15 @@ return {
                 "-node_modules",
               },
               semanticTokens = true,
+              -- Performance optimization
+              buildFlags = {"-tags=tools"}, -- Speeds up initial loading
+              memoryMode = "DegradeClosed", -- Better memory management
+              completionBudget = "500ms", -- Limit completion time
             },
+          },
+          -- Performance optimizations
+          flags = {
+            debounce_text_changes = 150, -- Reduce text change frequency
           },
         },
       },
@@ -186,7 +188,7 @@ return {
       opts.ensure_installed = opts.ensure_installed or {}
       vim.list_extend(
         opts.ensure_installed,
-        { "goimports", "gofumpt", "gomodifytags", "impl", "delve" }
+        { "gofumpt", "delve" }
       )
     end,
   },
